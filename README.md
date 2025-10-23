@@ -90,6 +90,7 @@ bun run tauri build
 ## Support
 
 * [Documentation](https://relaydrive.rotationracing.eu/docs/)
+* [Status Page](https://status.rotationracing.eu)
 * [Join Discord](https://discord.gg/tXMAbRChWn) for community help
 * For **account or payment** issues: [support@rotationracing.eu](mailto:support@rotationracing.eu)
 
