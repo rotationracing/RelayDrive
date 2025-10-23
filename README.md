@@ -56,7 +56,7 @@ RelayDrive is in **Alpha Stage**. Features are rapidly evolving, and commits are
 * [Tauri](https://tauri.app/) – Lightweight desktop app framework
 * [Next.js](https://nextjs.org/) – Frontend framework
 * [TailwindCSS](https://tailwindcss.com/) – Styling
-* [ShadCN Components](https://shadcn.dev/) – UI components
+* [shadcn Components](https://ui.shadcn.com/) – UI components
 * [Bun](https://bun.sh/) – Runtime for faster builds and scripts
 * [Rust](https://www.rust-lang.org/) – Backend language
 
