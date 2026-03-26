@@ -2,7 +2,7 @@
   "name": "relaydrive",
   "version": "0.0.3",
   "relaydriveGameVersions": {
-    "ACC": "0.0.2",
+    "ACC": "0.0.3",
     "LMU": "0.0.2",
     "iRacing": "0.0.2"
   },
