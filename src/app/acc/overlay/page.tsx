@@ -32,6 +32,7 @@ export default function Page() {
   const [dragId, setDragId] = useState<string | null>(null)
   const [presetName, setPresetName] = useState("")
   const [createPresetOpen, setCreatePresetOpen] = useState(false)
+  const [highlightPower, setHighlightPower] = useState(false)
 
   // Create a ref to hold the save function
   const saveDefaultConfigRef = useRef<((overlays: OverlayInstance[]) => Promise<void>) | null>(null)
@@ -270,12 +271,20 @@ export default function Page() {
     setDragId(null)
   }
 
-  return (
-    <div className="mx-auto flex h-full w-full max-w-5xl flex-col gap-6 overflow-hidden px-6 py-6 md:px-8 md:py-8">
-      <div className="flex-shrink-0 space-y-6">
-        <OverlayPageHeader />
+  const handleToggleOverlayWithHighlight = (id: string) => {
+    toggleOverlay(id)
+    if (!overlaysEnabled) {
+      setHighlightPower(true)
+      setTimeout(() => setHighlightPower(false), 600)
+    }
+  }
 
-        <OverlayPresetsCard
+  return (
+    <div className="mx-auto flex h-full w-full max-w-6xl flex-col gap-6 overflow-hidden px-6 py-6 md:px-8 md:py-8">
+      <div className="flex-shrink-0 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <OverlayPageHeader />
+        <div className="w-full md:w-auto pb-1 md:pb-0">
+          <OverlayPresetsCard
           overlaysEnabled={overlaysEnabled}
           onToggleOverlaysEnabled={handleToggleOverlaysEnabled}
           selectedPreset={configHook.selectedPreset}
@@ -290,11 +299,12 @@ export default function Page() {
           editMode={editMode}
           onToggleEditMode={toggleEditMode}
           editModeHotkey={settings?.hotkeys?.toggle_overlay_edit_mode ?? undefined}
+          highlightPower={highlightPower}
         />
+        </div>
       </div>
 
-      <div className="flex-1 flex gap-6 min-h-0 items-start">
-      <div className="flex flex-1 min-h-0 items-start gap-6">
+      <div className="flex-1 flex min-h-0 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card shadow-sm">
         <OverlaySidebar
           overlays={overlays}
           activeId={activeId}
@@ -302,19 +312,18 @@ export default function Page() {
           query={query}
           onQueryChange={setQuery}
           editMode={editMode}
-          onToggleOverlay={toggleOverlay}
+          onToggleOverlay={handleToggleOverlayWithHighlight}
           onDragStart={startDrag}
           onDrop={onDrop}
         />
 
-        <div className="flex-1 h-full min-w-0">
+        <div className="flex-1 h-full min-w-0 bg-background/30">
           <OverlaySettingsPanel
             activeOverlay={activeOverlay}
             moduleMap={moduleMap}
             updateOverlay={updateOverlay}
           />
         </div>
-      </div>
       </div>
 
       <CreatePresetDialog

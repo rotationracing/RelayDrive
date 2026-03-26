@@ -162,6 +162,19 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground select-none; /* Disable text selection app-wide like a native client */
+  }
+  
+  /* Re-enable text selection specifically for form elements where users need it */
+  input, textarea, [contenteditable="true"] {
+    @apply select-auto cursor-text;
+  }
+
+  /* Strip focus outlines when simply clicking an element (mouse focus), 
+     but preserve the outline if navigating with keyboard (focus-visible) */
+  *:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
   }
 }

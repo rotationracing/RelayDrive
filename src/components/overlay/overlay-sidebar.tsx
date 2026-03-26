@@ -41,24 +41,21 @@ export function OverlaySidebar({
     })
 
     return (
-        <div className="flex flex-col h-full bg-card border rounded-[var(--radius-xl)] overflow-hidden w-80 shrink-0">
-            <div className="p-4 border-b space-y-4">
-                <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Overlays
-                </h2>
-                <div className="relative">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-col h-full w-72 shrink-0 border-r border-border bg-transparent">
+            <div className="px-3 border-b border-border md:px-4 h-[61px] flex items-center shrink-0">
+                <div className="relative w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         value={query}
                         onChange={(e) => onQueryChange(e.target.value)}
-                        placeholder="Search..."
-                        className="pl-9 h-9 text-sm"
+                        placeholder="Search overlays..."
+                        className="pl-9 h-9 text-sm bg-muted/60 border-transparent hover:bg-muted/80 focus-visible:bg-muted focus-visible:border-border transition-colors rounded-[var(--radius-md)]"
                     />
                 </div>
             </div>
 
             <ScrollArea className="flex-1">
-                <div className="p-2 space-y-1">
+                <div className="p-1.5 space-y-0.5">
                     {filtered.map((overlay) => (
                         <div
                             key={overlay.id}
@@ -82,19 +79,15 @@ export function OverlaySidebar({
                             }}
                             onClick={() => onSelect(overlay.id)}
                             className={cn(
-                                "group flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all border border-transparent",
+                                "group flex items-center gap-3 px-3 py-3 rounded-[var(--radius-lg)] cursor-pointer transition-colors border border-transparent",
                                 activeId === overlay.id
-                                    ? "bg-accent text-accent-foreground border-border shadow-sm"
+                                    ? "bg-accent/60 text-accent-foreground border-border/60"
                                     : "hover:bg-muted/50 hover:border-border/50",
                                 !overlay.enabled && "opacity-60 grayscale-[0.5]"
                             )}
                         >
-                            {editMode && (
-                                <GripVertical className="h-4 w-4 text-muted-foreground cursor-move opacity-50 group-hover:opacity-100" />
-                            )}
-
                             <div className={cn(
-                                "flex items-center justify-center h-8 w-8 rounded-md shrink-0 transition-colors",
+                                "flex items-center justify-center h-8 w-8 rounded-[var(--radius-md)] shrink-0 transition-colors",
                                 activeId === overlay.id
                                     ? "bg-background text-foreground"
                                     : "bg-muted text-muted-foreground group-hover:bg-background group-hover:text-foreground"
@@ -119,11 +112,11 @@ export function OverlaySidebar({
                                 )}
                             </div>
 
-                            <div onClick={(e) => e.stopPropagation()}>
+                            <div onClick={(e) => e.stopPropagation()} className="flex shrink-0 items-center justify-center h-full">
                                 <Switch
                                     checked={overlay.enabled}
                                     onCheckedChange={() => onToggleOverlay(overlay.id)}
-                                    className="scale-75 data-[state=checked]:bg-primary"
+                                    className="scale-75 data-[state=checked]:bg-red-accent"
                                 />
                             </div>
                         </div>

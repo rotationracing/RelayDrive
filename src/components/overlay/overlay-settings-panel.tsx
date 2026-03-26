@@ -41,7 +41,7 @@ export function OverlaySettingsPanel({
 
     if (!activeOverlay) {
         return (
-            <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 border rounded-[var(--radius-xl)] bg-card/50 border-dashed">
+            <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 bg-transparent">
                 <MousePointer2 className="h-12 w-12 mb-4 opacity-20" />
                 <p className="text-lg font-medium">No Overlay Selected</p>
                 <p className="text-sm opacity-70">Select an overlay from the sidebar to configure its settings.</p>
@@ -115,48 +115,46 @@ export function OverlaySettingsPanel({
     }
 
     return (
-        <div className="flex flex-col h-full bg-card border rounded-[var(--radius-xl)] overflow-hidden">
-            <div className="p-4 pb-0 mb-3">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <h2 className="text-base font-semibold">
-                            {activeOverlay.title}
-                        </h2>
-                        <div className="h-4 w-px bg-border/60" />
-                        <div className="flex items-center gap-2">
-                            <Switch
-                                id="overlay-enabled"
-                                checked={activeOverlay.enabled}
-                                onCheckedChange={(value) => updateOverlay(activeOverlay.id, { enabled: value })}
-                                className="scale-75"
-                            />
-                            <Label htmlFor="overlay-enabled" className="text-xs font-medium cursor-pointer text-muted-foreground">
-                                {activeOverlay.enabled ? "Enabled" : "Disabled"}
-                            </Label>
-                        </div>
-                    </div>
+        <div className="flex flex-col h-full bg-transparent">
+            <div className="px-4 border-b border-border md:px-5 h-[61px] flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-4">
+                    <h2 className="text-base font-semibold">
+                        {activeOverlay.title}
+                    </h2>
+                    <div className="h-4 w-px bg-border/60" />
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={resetComponentSettings}
-                            className="h-8 px-2 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
-                            disabled={!componentSettingsSchema || Object.keys(componentSettingsSchema).length === 0}
-                        >
-                            <RotateCcw className="h-3.5 w-3.5" />
-                            Reset Defaults
-                        </Button>
+                        <Switch
+                            id="overlay-enabled"
+                            checked={activeOverlay.enabled}
+                            onCheckedChange={(value) => updateOverlay(activeOverlay.id, { enabled: value })}
+                            className="scale-75"
+                        />
+                        <Label htmlFor="overlay-enabled" className="text-xs font-medium cursor-pointer text-muted-foreground">
+                            {activeOverlay.enabled ? "Enabled" : "Disabled"}
+                        </Label>
                     </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={resetComponentSettings}
+                        className="h-8 px-2 text-xs gap-1.5 text-muted-foreground hover:text-foreground"
+                        disabled={!componentSettingsSchema || Object.keys(componentSettingsSchema).length === 0}
+                    >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        Reset Defaults
+                    </Button>
                 </div>
             </div>
 
-            <div className="px-4 flex gap-6 border-b">
+            <div className="px-4 pt-3 flex gap-5 border-b border-border md:px-5">
                 {categories.map(([category]) => (
                     <button
                         key={category}
                         onClick={() => setActiveTab(category)}
                         className={cn(
-                            "pb-2 text-sm font-medium transition-colors border-b-2 -mb-px",
+                            "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                             currentTab === category
                                 ? "border-primary text-foreground"
                                 : "border-transparent text-muted-foreground hover:text-foreground/80"
@@ -168,57 +166,59 @@ export function OverlaySettingsPanel({
             </div>
 
             <ScrollArea className="flex-1">
-                <div className="p-2 space-y-2">
+                <div className="p-4 md:p-6 pb-12">
                     {categories.map(([category, settings]) => {
                         if (category !== currentTab) return null
 
                         return (
-                            <div key={category} className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">
-                                {settings.map(([key, setting]) => {
-                                    const currentValue = currentComponentSettings[key] ?? setting.defaultValue
-                                    const isColor = setting.type === "color"
-                                    const isSlider = setting.type === "slider" && typeof setting.defaultValue === "number"
-                                    const isSwitch = setting.type === "switch" && typeof setting.defaultValue === "boolean"
-                                    const isSelect = setting.type === "select" && typeof setting.defaultValue === "string" && setting.options
+                            <section key={category} className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                <div className="overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card">
+                                    <div className="divide-y divide-border">
+                                        {settings.map(([key, setting]) => {
+                                            const currentValue = currentComponentSettings[key] ?? setting.defaultValue
+                                            const isColor = setting.type === "color"
+                                            const isSlider = setting.type === "slider" && typeof setting.defaultValue === "number"
+                                            const isSwitch = setting.type === "switch" && typeof setting.defaultValue === "boolean"
+                                            const isSelect = setting.type === "select" && typeof setting.defaultValue === "string" && setting.options
 
-                                    const colorValue = isColor
-                                        ? (() => {
-                                            let val: [number, number, number, number] = [0, 0, 0, 1]
-                                            if (Array.isArray(currentValue) && currentValue.length === 4) {
-                                                val = [
-                                                    Number(currentValue[0]) || 0,
-                                                    Number(currentValue[1]) || 0,
-                                                    Number(currentValue[2]) || 0,
-                                                    Number(currentValue[3]) ?? 1
-                                                ] as [number, number, number, number]
-                                            } else if (Array.isArray(setting.defaultValue) && setting.defaultValue.length === 4) {
-                                                val = [
-                                                    Number(setting.defaultValue[0]) || 0,
-                                                    Number(setting.defaultValue[1]) || 0,
-                                                    Number(setting.defaultValue[2]) || 0,
-                                                    Number(setting.defaultValue[3]) ?? 1
-                                                ] as [number, number, number, number]
-                                            }
-                                            val[3] = Math.max(0, Math.min(1, val[3]))
-                                            return val
-                                        })()
-                                        : null
+                                            const colorValue = isColor
+                                                ? (() => {
+                                                    let val: [number, number, number, number] = [0, 0, 0, 1]
+                                                    if (Array.isArray(currentValue) && currentValue.length === 4) {
+                                                        val = [
+                                                            Number(currentValue[0]) || 0,
+                                                            Number(currentValue[1]) || 0,
+                                                            Number(currentValue[2]) || 0,
+                                                            Number(currentValue[3]) ?? 1
+                                                        ] as [number, number, number, number]
+                                                    } else if (Array.isArray(setting.defaultValue) && setting.defaultValue.length === 4) {
+                                                        val = [
+                                                            Number(setting.defaultValue[0]) || 0,
+                                                            Number(setting.defaultValue[1]) || 0,
+                                                            Number(setting.defaultValue[2]) || 0,
+                                                            Number(setting.defaultValue[3]) ?? 1
+                                                        ] as [number, number, number, number]
+                                                    }
+                                                    val[3] = Math.max(0, Math.min(1, val[3]))
+                                                    return val
+                                                })()
+                                                : null
 
-                                    const displayValue = !isColor
-                                        ? (typeof currentValue === "number" ? currentValue : currentValue)
-                                        : null
-                                    const unit = setting.unit || ""
+                                            const displayValue = !isColor
+                                                ? (typeof currentValue === "number" ? currentValue : currentValue)
+                                                : null
+                                            const unit = setting.unit || ""
 
-                                    return (
-                                        <div key={key} className="flex items-center justify-between p-2 rounded-lg hover:bg-card border border-transparent hover:border-border/50 transition-colors">
-                                            <div className="space-y-0.5 flex-1 min-w-0 mr-6">
-                                                <Label className="text-sm font-medium">{setting.label}</Label>
-                                                {setting.description && (
-                                                    <p className="text-[10px] text-muted-foreground leading-tight">{setting.description}</p>
-                                                )}
-                                            </div>
+                                            return (
+                                                <div key={key} className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-4 py-5 md:px-6 hover:bg-muted/20 transition-colors">
+                                                    <div className="space-y-1 flex-1 min-w-0 pr-6">
+                                                        <div className="text-sm font-semibold text-foreground">{setting.label}</div>
+                                                        {setting.description && (
+                                                            <p className="text-sm leading-6 text-muted-foreground">{setting.description}</p>
+                                                        )}
+                                                    </div>
 
-                                            <div className="shrink-0">
+                                                    <div className="flex items-center shrink-0 justify-end">
                                                 {isSwitch && (
                                                     <Switch
                                                         checked={currentValue as boolean}
@@ -311,7 +311,9 @@ export function OverlaySettingsPanel({
                                         </div>
                                     )
                                 })}
-                            </div>
+                                    </div>
+                                </div>
+                            </section>
                         )
                     })}
                 </div>

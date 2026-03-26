@@ -33,20 +33,22 @@ export function CreatePresetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md gap-0 rounded-[var(--radius-2xl)] border-border bg-card p-0 shadow-2xl">
         <DialogHeader>
-          <DialogTitle>Save new preset</DialogTitle>
-          <DialogDescription>Enter a name to save the current overlay layout.</DialogDescription>
+          <div className="border-b border-border px-6 py-5">
+            <DialogTitle>Save new preset</DialogTitle>
+            <DialogDescription className="mt-2">Enter a name to save the current overlay layout.</DialogDescription>
+          </div>
         </DialogHeader>
-        <div className="space-y-3">
+        <div className="px-6 py-4">
           <Input
             value={presetName}
             onChange={(event) => onPresetNameChange(event.target.value)}
             placeholder="Preset name"
-            className="h-10 rounded-[var(--radius-lg)]"
+            className="h-11 rounded-[var(--radius-lg)] border-border bg-input"
           />
         </div>
-        <DialogFooter className="mt-4">
+        <DialogFooter className="px-6 pb-5 pt-0">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-[var(--radius-lg)]">
             Cancel
           </Button>
