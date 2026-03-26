@@ -36,6 +36,7 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: "./src-tauri -> target"
+          shared-key: "rust-shared"
 
       - name: Install Dependencies
         run: bun install
