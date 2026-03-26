@@ -2,14 +2,17 @@ name: Release
 on:
   push:
     tags:
-      - 'v*' # Only runs when you push a tag like v0.0.1
+      - "v*.*.*"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
 
 jobs:
   publish:
-    permissions:
-      contents: write
-      discussions: write
-      pull-requests: write
     runs-on: windows-latest
 
     steps:
@@ -28,9 +31,10 @@ jobs:
         with:
           workspaces: "./src-tauri -> target"
           shared-key: "rust-shared"
+          cache-on-failure: true
 
       - name: Install Dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
@@ -39,8 +43,8 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          tagName: v__VERSION__ 
-          releaseName: "RelayDrive v__VERSION__"
+          tagName: ${{ github.ref_name }}
+          releaseName: "RelayDrive ${{ github.ref_name }}"
           releaseBody: "Automated release for RelayDrive."
           releaseDraft: true
           prerelease: false
