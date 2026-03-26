@@ -1,6 +1,5 @@
 "use client"
 
-import { useSettingsModal } from "@/contexts/SettingsModalContext"
 import {
   ChevronsUpDown,
   LogOut,
@@ -49,7 +48,6 @@ export function NavUser({
   onSettings,
   onLogout,
 }: NavUserProps) {
-  const { setOpen: setSettingsOpen } = useSettingsModal()
   let sidebarContext: ReturnType<typeof useSidebar> | null = null
   try {
     sidebarContext = useSidebar()
@@ -145,10 +143,7 @@ export function NavUser({
                 <User />
                 Profile
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => {
-                onSettings?.()
-                setSettingsOpen(true)
-              }}>
+              <DropdownMenuItem onSelect={() => onSettings?.()}>
                 <Settings />
                 Settings
               </DropdownMenuItem>

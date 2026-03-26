@@ -5,7 +5,6 @@ import DeepLinkListener from "@/components/deep-link-listener"
 import { ThemeProvider } from "@/components/theme-provider"
 import TitleBar from "@/components/titlebar"
 import { Toaster } from "@/components/ui/sonner"
-import { SettingsModal } from "@/components/settings/settings-modal"
 import { GlobalHotkeyListener } from "@/components/global-hotkey-listener"
 import { OverlayWindowSync } from "@/components/overlay-window-sync"
 import { HotkeyActionRegistrar } from "@/components/hotkey-action-registrar"
@@ -14,7 +13,6 @@ import { AccGraphicsProvider } from "@/contexts/AccGraphicsContext"
 import { AccBroadcastProvider } from "@/contexts/AccBroadcastContext"
 import { AppBootstrapProvider } from "@/contexts/AppBootstrapContext"
 import { ProcessProvider } from "@/contexts/ProcessContext"
-import { SettingsModalProvider } from "@/contexts/SettingsModalContext"
 import { SettingsProvider } from "@/contexts/SettingsContext"
 import { UserProvider } from "@/contexts/UserContext"
 import type React from "react"
@@ -59,9 +57,8 @@ export function MainAppLayout({ children }: { children: React.ReactNode }) {
               disableTransitionOnChange
             >
               <SettingsProvider>
-                <SettingsModalProvider>
-                  <AppBootstrapProvider>
-                    <UserProvider>
+                <AppBootstrapProvider>
+                  <UserProvider>
                     <HotkeyActionRegistrar />
                     <GlobalHotkeyListener />
                     <OverlayWindowSync />
@@ -74,11 +71,9 @@ export function MainAppLayout({ children }: { children: React.ReactNode }) {
                         </div>
                       </div>
                       <Toaster position="bottom-right" richColors closeButton />
-                      <SettingsModal />
                     </div>
-                    </UserProvider>
-                  </AppBootstrapProvider>
-                </SettingsModalProvider>
+                  </UserProvider>
+                </AppBootstrapProvider>
               </SettingsProvider>
             </ThemeProvider>
           </AccBroadcastProvider>

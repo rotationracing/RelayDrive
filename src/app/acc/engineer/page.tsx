@@ -109,7 +109,8 @@ function EngineerPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 overflow-auto h-full flex flex-col">
+    <div className="mx-auto h-full w-full max-w-5xl px-6 py-6 md:px-8 md:py-8">
+    <div className="flex h-full flex-col space-y-6 overflow-auto">
       <div>
         <h1 className="text-3xl font-bold mb-2">AI Race Engineer</h1>
         <p className="text-muted-foreground">Your intelligent racing companion with real-time telemetry analysis.</p>
@@ -289,6 +290,7 @@ function EngineerPage() {
           </div>
         </CardContent>
       </Card>
+    </div>
     </div>
   )
 }

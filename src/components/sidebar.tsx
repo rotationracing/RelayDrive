@@ -295,10 +295,10 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
           router.push(`${basePath}/engineer`);
           break;
         case "profile":
-          router.push("/profile");
+          router.push(basePath ? `${basePath}/profile` : "/profile");
           break;
         case "settings":
-          router.push("/settings");
+          router.push(basePath ? `${basePath}/settings` : "/settings");
           break;
         default:
           router.push(basePath);
@@ -414,8 +414,8 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
             avatar: userAvatar ?? '',
           }}
           onUpgrade={handleUpgrade}
-          onProfile={() => onPageChange("profile" as Page)}
-          onSettings={() => onPageChange("settings" as Page)}
+          onProfile={() => navigate("profile" as Page)}
+          onSettings={() => navigate("settings" as Page)}
           onLogout={handleLogout}
         />
       </div>

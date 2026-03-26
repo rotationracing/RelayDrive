@@ -125,7 +125,8 @@ function HomePage() {
   const carLabel = useMemo(() => prettifyCarName(currentSession.car), [currentSession.car]);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="mx-auto w-full max-w-5xl px-6 py-6 md:px-8 md:py-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
         <p className="text-muted-foreground">
@@ -281,25 +282,21 @@ function HomePage() {
             <div className="space-y-3">
               <div className="border-l-2 border-red-accent pl-4">
                 <div className="flex items-center justify-between mb-1">
-                  <div className="font-medium">v1.2.0</div>
+                  <div className="font-medium">v0.0.2</div>
                   <Badge variant="outline" className="rounded-control text-xs">
                     Latest
                   </Badge>
                 </div>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Enhanced status monitoring system</li>
-                  <li>• Improved dark mode contrast</li>
-                  <li>• Better session information display</li>
-                  <li>• Fixed scrolling performance issues</li>
+                  <li>• New settings page design</li>
+                  <li>• Preparing design rework of the app</li>
                 </ul>
               </div>
 
               <div className="border-l-2 border-muted pl-4">
-                <div className="font-medium mb-1">v1.1.5</div>
+                <div className="font-medium mb-1">v0.0.1</div>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• AI Engineer conversation improvements</li>
-                  <li>• New overlay customization options</li>
-                  <li>• Performance optimizations</li>
+                  <li>• Very early alpha release</li>
                 </ul>
               </div>
             </div>
@@ -308,6 +305,7 @@ function HomePage() {
       </div>
 
 
+    </div>
     </div>
   )
 }

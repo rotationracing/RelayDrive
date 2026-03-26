@@ -271,7 +271,7 @@ export default function Page() {
   }
 
   return (
-    <div className="flex flex-col h-full p-6 gap-6 overflow-hidden">
+    <div className="mx-auto flex h-full w-full max-w-5xl flex-col gap-6 overflow-hidden px-6 py-6 md:px-8 md:py-8">
       <div className="flex-shrink-0 space-y-6">
         <OverlayPageHeader />
 
@@ -294,6 +294,7 @@ export default function Page() {
       </div>
 
       <div className="flex-1 flex gap-6 min-h-0 items-start">
+      <div className="flex flex-1 min-h-0 items-start gap-6">
         <OverlaySidebar
           overlays={overlays}
           activeId={activeId}
@@ -313,6 +314,7 @@ export default function Page() {
             updateOverlay={updateOverlay}
           />
         </div>
+      </div>
       </div>
 
       <CreatePresetDialog

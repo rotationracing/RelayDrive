@@ -1,6 +1,6 @@
 [package]
 name = "relaydrive"
-version = "0.0.1"
+version = "0.0.2"
 description = "Overlay and Telemetry App for sim racing games"
 authors = ["rotationracing"]
 license = "APGL-3.0"

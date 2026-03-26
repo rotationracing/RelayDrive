@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "RelayDrive",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "identifier": "eu.rotationracing.relaydrive",
   "build": {
     "frontendDist": "../out",

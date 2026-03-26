@@ -338,7 +338,8 @@ export default function ConsolePage() {
     [latest?.status, sessionInfo]
   )
   return (
-    <div className="p-6 space-y-6">
+    <div className="mx-auto w-full max-w-5xl px-6 py-6 md:px-8 md:py-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">Console</h1>
         <p className="text-muted-foreground">Live ACC telemetry and broadcast data streamed directly into RelayDrive.</p>
@@ -529,6 +530,7 @@ export default function ConsolePage() {
           </div>
         </CardContent>
       </Card>
+    </div>
     </div>
   )
 }
