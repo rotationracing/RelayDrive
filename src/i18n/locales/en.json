@@ -1,0 +1,103 @@
+{
+  "common": {
+    "language": "Language",
+    "choose_language": "Choose your preferred language",
+    "measurement_units": "Measurement Units",
+    "choose_units": "Choose how values are displayed",
+    "custom": "Custom",
+    "imperial": "Imperial",
+    "metric": "Metric",
+    "save": "Save",
+    "cancel": "Cancel",
+    "check_for_updates": "Check for updates",
+    "check_for_updates_desc": "Show update availability and allow installing updates",
+    "connection_settings": "Telemetry Connection",
+    "connection_settings_desc": "Configure connection details (don't touch if you don't know what you are doing)",
+    "host": "Host",
+    "port": "Port",
+    "connection_password": "Connection Password",
+    "command_password": "Command Password",
+    "acc": "ACC",
+    "iracing": "iRacing",
+    "lmu": "LMU"
+  },
+  "units": {
+    "distance": {
+      "label": "Distance",
+      "metric_name": "Meters",
+      "imperial_name": "Miles",
+      "metric_abbr": "m",
+      "imperial_abbr": "mi"
+    },
+    "speed": {
+      "label": "Speed",
+      "metric_name": "Kilometers per hour",
+      "imperial_name": "Miles per hour",
+      "metric_abbr": "km/h",
+      "imperial_abbr": "mph"
+    },
+    "acceleration": {
+      "label": "Acceleration",
+      "metric_name": "Meters per second squared",
+      "imperial_name": "Feet per second squared",
+      "metric_abbr": "m/s²",
+      "imperial_abbr": "ft/s²"
+    },
+    "temperature": {
+      "label": "Temperature",
+      "celsius_name": "Celsius",
+      "fahrenheit_name": "Fahrenheit",
+      "celsius_abbr": "C",
+      "fahrenheit_abbr": "F"
+    },
+    "pressure": {
+      "label": "Pressure",
+      "bar_name": "bar",
+      "psi_name": "psi",
+      "bar_abbr": "bar",
+      "psi_abbr": "psi"
+    },
+    "torque": {
+      "label": "Torque",
+      "nm_name": "Newton meters",
+      "lbft_name": "Pound-feet",
+      "nm_abbr": "Nm",
+      "lbft_abbr": "lb-ft"
+    },
+    "power": {
+      "label": "Power",
+      "hp_name": "Horsepower",
+      "kw_name": "Kilowatts",
+      "hp_abbr": "HP",
+      "kw_abbr": "kW"
+    },
+    "fuel_volume": {
+      "label": "Fuel Volume",
+      "metric_name": "Liters",
+      "imperial_name": "Gallons",
+      "metric_abbr": "L",
+      "imperial_abbr": "gal"
+    },
+    "suspension_travel": {
+      "label": "Suspension Travel",
+      "mm_name": "Millimeters",
+      "in_name": "Inches",
+      "mm_abbr": "mm",
+      "in_abbr": "in"
+    },
+    "tire_pressure": {
+      "label": "Tire Pressure",
+      "bar_name": "bar",
+      "psi_name": "psi",
+      "bar_abbr": "bar",
+      "psi_abbr": "psi"
+    },
+    "fuel_consumption": {
+      "label": "Fuel Consumption",
+      "metric_name": "Liters per hour",
+      "imperial_name": "Gallons per hour",
+      "metric_abbr": "L/h",
+      "imperial_abbr": "gal/h"
+    }
+  }
+}

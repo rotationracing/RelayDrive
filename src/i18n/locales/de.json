@@ -1,0 +1,103 @@
+{
+  "common": {
+    "language": "Sprache",
+    "choose_language": "Sprache auswählen",
+    "measurement_units": "Maßeinheiten",
+    "choose_units": "Darstellungsformat auswählen",
+    "custom": "Benutzerdefiniert",
+    "imperial": "Imperial",
+    "metric": "Metrisch",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "check_for_updates": "Nach Updates suchen",
+    "check_for_updates_desc": "Verfügbare Updates anzeigen und Installation ermöglichen",
+    "connection_settings": "Telemetrie Verbindung",
+    "connection_settings_desc": "Verbindungsdetails einstellen (Nur ändern wenn du weißt was du tust)",
+    "host": "Host",
+    "port": "Port",
+    "connection_password": "Connection Password",
+    "command_password": "Command Password",
+    "acc": "ACC",
+    "iracing": "iRacing",
+    "lmu": "LMU"
+  },
+  "units": {
+    "distance": {
+      "label": "Entfernung",
+      "metric_name": "Meter",
+      "imperial_name": "Meilen",
+      "metric_abbr": "m",
+      "imperial_abbr": "mi"
+    },
+    "speed": {
+      "label": "Geschwindigkeit",
+      "metric_name": "Kilometer pro Stunde",
+      "imperial_name": "Meilen pro Stunde",
+      "metric_abbr": "km/h",
+      "imperial_abbr": "mph"
+    },
+    "acceleration": {
+      "label": "Beschleunigung",
+      "metric_name": "Meter pro Quadratsekunde",
+      "imperial_name": "Fuß pro Quadratsekunde",
+      "metric_abbr": "m/s²",
+      "imperial_abbr": "ft/s²"
+    },
+    "temperature": {
+      "label": "Temperatur",
+      "celsius_name": "Celsius",
+      "fahrenheit_name": "Fahrenheit",
+      "celsius_abbr": "°C",
+      "fahrenheit_abbr": "°F"
+    },
+    "pressure": {
+      "label": "Druck",
+      "bar_name": "bar",
+      "psi_name": "psi",
+      "bar_abbr": "bar",
+      "psi_abbr": "psi"
+    },
+    "torque": {
+      "label": "Drehmoment",
+      "nm_name": "Newtonmeter",
+      "lbft_name": "Pfund-Fuß",
+      "nm_abbr": "Nm",
+      "lbft_abbr": "lb-ft"
+    },
+    "power": {
+      "label": "Leistung",
+      "hp_name": "Pferdestärken",
+      "kw_name": "Kilowatt",
+      "hp_abbr": "PS",
+      "kw_abbr": "kW"
+    },
+    "fuel_volume": {
+      "label": "Kraftstoffvolumen",
+      "metric_name": "Liter",
+      "imperial_name": "Gallonen",
+      "metric_abbr": "L",
+      "imperial_abbr": "gal"
+    },
+    "suspension_travel": {
+      "label": "Federweg",
+      "mm_name": "Millimeter",
+      "in_name": "Zoll",
+      "mm_abbr": "mm",
+      "in_abbr": "in"
+    },
+    "tire_pressure": {
+      "label": "Reifendruck",
+      "bar_name": "bar",
+      "psi_name": "psi",
+      "bar_abbr": "bar",
+      "psi_abbr": "psi"
+    },
+    "fuel_consumption": {
+      "label": "Kraftstoffverbrauch",
+      "metric_name": "Liter pro Stunde",
+      "imperial_name": "Gallonen pro Stunde",
+      "metric_abbr": "L/h",
+      "imperial_abbr": "gal/h"
+    }
+  }
+}

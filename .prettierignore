@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+dist
+coverage
+src-tauri/target
+src-tauri/target/**
+.target
+**/*.svg
+
+

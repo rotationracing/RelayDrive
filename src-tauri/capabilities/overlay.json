@@ -1,0 +1,22 @@
+{
+  "identifier": "overlay-capability",
+  "description": "permissions for overlay windows",
+  "windows": [
+    "overlay-*"
+  ],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "core:event:allow-listen",
+    "core:event:allow-emit",
+    "core:event:allow-emit-to",
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-set-position",
+    "core:window:allow-set-size",
+    "core:window:allow-show",
+    "core:window:allow-hide",
+    "core:webview:default"
+  ]
+}
+
