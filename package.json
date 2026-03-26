@@ -1,6 +1,6 @@
 {
   "name": "relaydrive",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "relaydriveGameVersions": {
     "ACC": "0.0.2",
     "LMU": "0.0.2",
