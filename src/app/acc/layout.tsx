@@ -15,7 +15,6 @@ export default function ACCLayout({ children }: { children: React.ReactNode }) {
     if (!pathname) return "home"
     if (pathname.startsWith("/acc/overlay")) return "overlay"
     if (pathname.startsWith("/acc/console")) return "console"
-    if (pathname.startsWith("/acc/engineer")) return "engineer"
     if (pathname.startsWith("/acc/settings")) return "settings"
     if (pathname.startsWith("/acc/profile")) return "profile"
     return "home"

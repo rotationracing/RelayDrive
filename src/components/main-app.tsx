@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/sidebar"
 import { useState } from "react"
 
-export type Page = "home" | "overlay" | "console" | "engineer" | "profile" | "settings"
+export type Page = "home" | "overlay" | "console" | "profile" | "settings" | "setup"
 
 interface MainAppProps {
   onboarding?: boolean;
@@ -20,8 +20,6 @@ const MainApp = ({ onboarding }: MainAppProps) => {
         return <div className="p-6">Overlay</div>
       case "console":
         return <div className="p-6">Console</div>
-      case "engineer":
-        return <div className="p-6">Engineer</div>
       default:
         return <div className="p-6">Home</div>
     }

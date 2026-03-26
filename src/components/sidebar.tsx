@@ -159,7 +159,6 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
     { id: "home" as Page, label: "Home", icon: Home },
     { id: "overlay" as Page, label: "Overlay", icon: Monitor },
     { id: "setup" as Page, label: "Setup", icon: SlidersHorizontal },
-    { id: "engineer" as Page, label: "Race Engineer", icon: AudioWaveform },
     { id: "console" as Page, label: "Console", icon: Terminal },
   ];
 
@@ -291,14 +290,14 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
         case "console":
           router.push(`${basePath}/console`);
           break;
-        case "engineer":
-          router.push(`${basePath}/engineer`);
-          break;
         case "profile":
           router.push(basePath ? `${basePath}/profile` : "/profile");
           break;
         case "settings":
           router.push(basePath ? `${basePath}/settings` : "/settings");
+          break;
+        case "setup":
+          router.push(basePath ? `${basePath}/setup` : "/setup");
           break;
         default:
           router.push(basePath);

@@ -58,3 +58,7 @@ next-env.d.ts
 .DS_Store
 
 .agents/*
+
+# Local CLI tools
+/bump.bat
+/scripts/bump-version.ts
