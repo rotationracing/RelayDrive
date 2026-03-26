@@ -44,6 +44,11 @@ export default function OnboardingPage() {
     hotkeys: {
       toggle_overlay_edit_mode: "Alt + E",
     },
+    connectionSettings: {
+      acc: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
+      iracing: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
+      lmu: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
+    },
     dataShareConsent: false,
     proSubscriptionPlan: null,
   }))
@@ -65,6 +70,11 @@ export default function OnboardingPage() {
       measurement_units: globalSettings.measurement_units || CHOICE_METRIC,
       hotkeys: globalSettings.hotkeys || {
         toggle_overlay_edit_mode: "Alt + E",
+      },
+      connectionSettings: globalSettings.connectionSettings || {
+        acc: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
+        iracing: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
+        lmu: { host: "127.0.0.1", port: 9000, connectionPassword: "", commandPassword: "" },
       },
       dataShareConsent: globalSettings.dataShareConsent ?? false,
       proSubscriptionPlan: globalSettings.proSubscriptionPlan ?? null,
