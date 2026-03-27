@@ -1,11 +1,5 @@
-use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Emitter};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct HotkeyRegistration {
-    pub shortcut: String,
-}
 
 /// Parse shortcut string to Tauri format
 fn parse_shortcut(shortcut: &str) -> Result<(Modifiers, Code), String> {

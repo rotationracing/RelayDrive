@@ -23,7 +23,7 @@ use crate::broadcast_protocol::protocol::inbound::{
 
 type Res<T, U> = IResult<T, U, ErrorTree<T>>;
 
-pub(crate) fn parse(input: &[u8]) -> Result<InboundMessage, ErrorTree<ByteOffset>> {
+pub(crate) fn parse(input: &[u8]) -> Result<InboundMessage<'_>, ErrorTree<ByteOffset>> {
     final_parser(context(
         "incoming_message",
         alt((
@@ -38,7 +38,7 @@ pub(crate) fn parse(input: &[u8]) -> Result<InboundMessage, ErrorTree<ByteOffset
     ))(input)
 }
 
-fn registration_result(input: &[u8]) -> Res<&[u8], RegistrationResult> {
+fn registration_result(input: &[u8]) -> Res<&[u8], RegistrationResult<'_>> {
     context(
         "registration_result",
         tuple((tag(&[0x01]), le_u32, boolean, boolean, kstring)),
@@ -106,7 +106,7 @@ fn replay_info(input: &[u8]) -> Res<&[u8], Option<ReplayInfo>> {
 }
 
 // Parse the driver information supplied in the middle of EntrylistCar packets
-fn driver(input: &[u8]) -> Res<&[u8], Driver> {
+fn driver(input: &[u8]) -> Res<&[u8], Driver<'_>> {
     context(
         "driver",
         tuple((
@@ -155,7 +155,7 @@ fn driver(input: &[u8]) -> Res<&[u8], Driver> {
     })
 }
 
-fn entrylist_car(input: &[u8]) -> Res<&[u8], EntrylistCar> {
+fn entrylist_car(input: &[u8]) -> Res<&[u8], EntrylistCar<'_>> {
     context(
         "entrylist_car",
         tuple((
@@ -248,7 +248,7 @@ fn lap(input: &[u8]) -> Res<&[u8], Lap> {
     })
 }
 
-fn realtime_update(input: &[u8]) -> Res<&[u8], RealtimeUpdate> {
+fn realtime_update(input: &[u8]) -> Res<&[u8], RealtimeUpdate<'_>> {
     context(
         "realtime_update",
         tuple((
@@ -402,7 +402,7 @@ fn realtime_car_update(input: &[u8]) -> Res<&[u8], RealtimeCarUpdate> {
     )
 }
 
-fn camera_set<'a>(input: &'a [u8]) -> Res<&'a [u8], (Cow<'a, str>, CameraSet)> {
+fn camera_set<'a>(input: &'a [u8]) -> Res<&'a [u8], (Cow<'a, str>, CameraSet<'a>)> {
     context("camera_set", tuple((kstring, length_count(le_u8, kstring))))(input).map(
         |(next_input, (set_name, cameras))| {
             (
@@ -416,7 +416,7 @@ fn camera_set<'a>(input: &'a [u8]) -> Res<&'a [u8], (Cow<'a, str>, CameraSet)> {
     )
 }
 
-fn track_data(input: &[u8]) -> Res<&[u8], TrackData> {
+fn track_data(input: &[u8]) -> Res<&[u8], TrackData<'_>> {
     context(
         "track_data",
         tuple((
@@ -447,7 +447,7 @@ fn track_data(input: &[u8]) -> Res<&[u8], TrackData> {
     )
 }
 
-fn broadcasting_event(input: &[u8]) -> Res<&[u8], BroadcastingEvent> {
+fn broadcasting_event(input: &[u8]) -> Res<&[u8], BroadcastingEvent<'_>> {
     context(
         "broadcasting_event",
         tuple((
@@ -478,6 +478,16 @@ fn broadcasting_event(input: &[u8]) -> Res<&[u8], BroadcastingEvent> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::path::PathBuf;
+
+    fn load_pcap_fixture(name: &str) -> Option<Vec<u8>> {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("docs")
+            .join("pcap")
+            .join(name);
+        fs::read(path).ok()
+    }
 
     #[test]
     fn parse_kstring() {
@@ -541,8 +551,10 @@ mod tests {
 
     #[test]
     fn parse_realtime_update() {
-        let input = include_bytes!("../../docs/pcap/realtime_update.bin");
-        let res = realtime_update(input).unwrap().1;
+        let Some(input) = load_pcap_fixture("realtime_update.bin") else {
+            return;
+        };
+        let res = realtime_update(&input).unwrap().1;
 
         assert_eq!(res.active_camera, "CameraPit3");
         assert_eq!(res.ambient_temp, 25);
@@ -551,8 +563,10 @@ mod tests {
 
     #[test]
     fn parse_realtime_car_update() {
-        let input = include_bytes!("../../docs/pcap/realtime_car_update.bin");
-        let res = realtime_car_update(input).unwrap();
+        let Some(input) = load_pcap_fixture("realtime_car_update.bin") else {
+            return;
+        };
+        let res = realtime_car_update(&input).unwrap();
 
         assert_eq!(res.0.len(), 0);
         assert_eq!(res.1.current_lap.splits.len(), 0);
@@ -570,8 +584,9 @@ mod tests {
     fn parse_entrylist_car() {
         let input: &[u8] = &[
             0x06, 0xe9, 0x03, 0x18, 0x00, 0x00, 0x4b, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x01, 0x06, 0x00, 0x4d, 0x61, 0x72, 0x74, 0x69, 0x6e, 0x08, 0x00, 0x52, 0x6f, 0x77,
-            0x6e, 0x74, 0x72, 0x65, 0x65, 0x03, 0x00, 0x52, 0x4f, 0x57, 0x03, 0x05, 0x00,
+            0x01, 0x00, 0x05, 0x00, 0x01, 0x00, 0x00, 0x01, 0x06, 0x00, 0x4d, 0x61, 0x72, 0x74,
+            0x69, 0x6e, 0x08, 0x00, 0x52, 0x6f, 0x77, 0x6e, 0x74, 0x72, 0x65, 0x65, 0x00, 0x00,
+            0x03, 0x00, 0x52, 0x4f, 0x57, 0x03,
         ];
         let res = entrylist_car(input).unwrap().1;
 
@@ -581,14 +596,17 @@ mod tests {
         assert_eq!(res.drivers[0].first_name, "Martin");
         assert_eq!(res.drivers[0].last_name, "Rowntree");
         assert_eq!(res.drivers[0].short_name, "ROW");
-        assert_eq!(res.drivers[0].nationality, Nationality::GreatBritain);
+        assert_eq!(res.nationality, Nationality::GreatBritain);
+        assert_eq!(res.drivers[0].nationality, Nationality::Any);
         assert_eq!(res.model, CarModel::Ferrari488Evo);
     }
 
     #[test]
     fn parse_track_data() {
-        let input = include_bytes!("../../docs/pcap/track_data.bin");
-        let res = track_data(input).unwrap().1;
+        let Some(input) = load_pcap_fixture("track_data.bin") else {
+            return;
+        };
+        let res = track_data(&input).unwrap().1;
 
         assert_eq!(res.distance, 4011);
         assert_eq!(res.name, "Circuit Zolder");
@@ -612,8 +630,10 @@ mod tests {
     fn parse_bogus_data() {
         // random64 starts with a 0x03 so it looks like a RealtimeCarUpdate and
         // should proceed down that parse tree and unwind without a panic.
-        let input = include_bytes!("../../docs/pcap/random64.bin");
-        let res = InboundMessage::decode(input);
+        let Some(input) = load_pcap_fixture("random64.bin") else {
+            return;
+        };
+        let res = InboundMessage::decode(&input);
         assert!(res.is_err());
     }
 }

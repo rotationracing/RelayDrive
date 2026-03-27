@@ -20,7 +20,7 @@ pub fn run() {
     let mut builder = tauri::Builder::default();
 
     builder = builder.plugin(tauri_plugin_deep_link::init());
-    builder = builder.plugin(tauri_plugin_shell::init());
+    builder = builder.plugin(tauri_plugin_opener::init());
     builder = builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
 
     #[cfg(desktop)]

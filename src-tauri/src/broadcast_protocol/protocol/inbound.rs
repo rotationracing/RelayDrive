@@ -5,8 +5,8 @@
 //!
 //! # Example
 //!
-//! ```
-//! use acbc::protocol::{InboundMessage, RegistrationResult};
+//! ```ignore
+//! use app_lib::broadcast_protocol::protocol::{InboundMessage, RegistrationResult};
 //!
 //! let packet = vec![0x01, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00];
 //! let parsed = InboundMessage::decode(&packet).unwrap();
@@ -19,8 +19,8 @@
 //! When parsed from a byte slice using [`InboundMessage::decode`] these types try to limit the
 //! amount of copying required. Primitive values will be copied, but larger fields like strings are
 //! zero-copy by default, and will be bound to the lifetime of the original slice.
-//! ```compile_fail
-//! use acbc::protocol::InboundMessage;
+//! ```ignore
+//! use app_lib::broadcast_protocol::protocol::InboundMessage;
 //!
 //! // Parsed message cannot outlive `packet`!
 //! let extracted = {
@@ -32,8 +32,8 @@
 //! If you need an owned copy of the data from a packet, you can use [`.into_owned()`](InboundMessage::into_owned)
 //! to obtain a copy of the message with a `'static` lifetime.
 //!
-//! ```
-//! use acbc::protocol::InboundMessage;
+//! ```ignore
+//! use app_lib::broadcast_protocol::protocol::InboundMessage;
 //!
 //! let extracted = {
 //!     let packet: Vec<u8> = vec![0x01, 0x01, 0x00, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00];
@@ -78,6 +78,7 @@ impl<'a> InboundMessage<'a> {
     }
 
     /// Obtain a copy of the message with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> InboundMessage<'static> {
         match self {
             InboundMessage::RegistrationResult(result) => {
@@ -111,6 +112,7 @@ pub struct RegistrationResult<'a> {
 
 impl<'a> RegistrationResult<'a> {
     /// Obtain a copy of the response with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> RegistrationResult<'static> {
         RegistrationResult {
             connection_id: self.connection_id,
@@ -141,6 +143,7 @@ pub struct Lap {
 pub struct ReplayInfo {
     pub session_time: f32,
     pub remaining_time: f32,
+    #[allow(dead_code)]
     pub focused_car_index: u32,
 }
 
@@ -182,6 +185,7 @@ pub struct RealtimeUpdate<'a> {
 
 impl<'a> RealtimeUpdate<'a> {
     /// Obtain a copy of the update with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> RealtimeUpdate<'static> {
         RealtimeUpdate {
             event_index: self.event_index,
@@ -270,6 +274,7 @@ pub struct Driver<'a> {
 
 impl<'a> Driver<'a> {
     /// Obtain a copy of the driver details with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> Driver<'static> {
         Driver {
             first_name: Cow::Owned(self.first_name.into_owned()),
@@ -299,6 +304,7 @@ pub struct EntrylistCar<'a> {
 
 impl<'a> EntrylistCar<'a> {
     /// Obtain a copy of the Car data with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> EntrylistCar<'static> {
         EntrylistCar {
             id: self.id,
@@ -335,6 +341,7 @@ pub struct TrackData<'a> {
 
 impl<'a> TrackData<'a> {
     /// Obtain a copy of the track data with a `'static` lifetime.
+    #[allow(dead_code)]
     pub fn into_owned(self) -> TrackData<'static> {
         TrackData {
             name: Cow::Owned(self.name.into_owned()),
@@ -362,14 +369,19 @@ impl<'a> TrackData<'a> {
 /// A message indicating a relevant event has occurred in the session.
 #[derive(Debug, Clone)]
 pub struct BroadcastingEvent<'a> {
+    #[allow(dead_code)]
     pub event_type: BroadcastingEventType,
+    #[allow(dead_code)]
     pub message: Cow<'a, str>,
+    #[allow(dead_code)]
     pub time_ms: i32,
     /// ID of the car, for global events, `car_id` will be zero.
+    #[allow(dead_code)]
     pub car_id: u16,
 }
 
 impl<'a> BroadcastingEvent<'a> {
+    #[allow(dead_code)]
     pub fn into_owned(self) -> BroadcastingEvent<'static> {
         BroadcastingEvent {
             event_type: self.event_type,

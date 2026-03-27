@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use fnv::FnvHashMap;
 use log::debug;
 
@@ -33,7 +35,7 @@ impl CarContext {
         }
     }
 
-    pub fn current_driver(&self) -> Option<&Driver> {
+    pub fn current_driver(&self) -> Option<&Driver<'_>> {
         self.entry.as_ref().map(|e| {
             assert!(e.drivers.len() >= e.current_driver_index as usize);
             &e.drivers[e.current_driver_index as usize]
@@ -52,7 +54,7 @@ impl Context {
         Context::default()
     }
 
-    pub fn track_data(&self) -> Option<&TrackData> {
+    pub fn track_data(&self) -> Option<&TrackData<'_>> {
         self.track.as_ref()
     }
 
