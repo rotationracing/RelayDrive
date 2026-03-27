@@ -282,14 +282,22 @@ function HomePage() {
               <div className="space-y-3">
                 <div className="border-l-2 border-red-accent pl-4">
                   <div className="flex items-center justify-between mb-1">
-                    <div className="font-medium">v0.0.2</div>
+                    <div className="font-medium">v0.0.4</div>
                     <Badge variant="outline" className="rounded-control text-xs">
                       Latest
                     </Badge>
                   </div>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• New settings page design</li>
-                    <li>• Preparing design rework of the app</li>
+                    <li>• Compile warnings fixed</li>
+                    <li>• Updater bugs fixed</li>
+                    <li>• Versioning change</li>
+                  </ul>
+                </div>
+
+                <div className="border-l-2 border-muted pl-4">
+                  <div className="font-medium mb-1">v0.0.3</div>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Overlay page redesigned</li>
                   </ul>
                 </div>
 
