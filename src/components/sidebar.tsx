@@ -42,7 +42,6 @@ const GAME_LABELS: Record<string, { short: string; full: string }> = {
 export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: SidebarProps) {
   const router = useRouter();
   const appVersion = (pkg as any).version as string | undefined;
-  const gameVersions = ((pkg as any).relaydriveGameVersions || {}) as Record<string, string>;
 
   const gameKey = (() => {
     if (!basePath) return undefined;
@@ -52,7 +51,6 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
     if (key === "iracing") return "iRacing";
     return undefined;
   })();
-  const gameVersion = gameKey ? gameVersions[gameKey] : undefined;
   interface Profile {
     name: string;
     profileImage: string | null;
@@ -316,7 +314,6 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
         </div>
         <div className="text-xs text-muted-foreground mt-1">
           {`v${appVersion ?? "0.0.0"}`}
-          {gameKey ? ` - ${gameKey} v${gameVersion ?? "dev"}` : ""}
         </div>
       </div>
 
