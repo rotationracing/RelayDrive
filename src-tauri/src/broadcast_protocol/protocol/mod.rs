@@ -5,6 +5,7 @@ pub mod inbound;
 pub mod outbound;
 pub(crate) mod parser;
 
+#[allow(dead_code)]
 pub(crate) const PROTOCOL_VERSION: u8 = 4;
 
 pub use inbound::*;

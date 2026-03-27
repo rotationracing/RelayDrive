@@ -10,6 +10,7 @@ pub mod process;
 
 pub trait GameRuntime: Sync + Send {
     fn id(&self) -> &'static str;
+    #[allow(dead_code)]
     fn label(&self) -> &'static str;
     /// One or more executable names to detect for this game (lower/upper case insensitive).
     fn process_names(&self) -> &'static [&'static str];
@@ -32,6 +33,7 @@ pub fn get_runtime(id: &str) -> Option<&'static dyn GameRuntime> {
         .find(|runtime| runtime.id().eq_ignore_ascii_case(needle))
 }
 
+#[allow(dead_code)]
 pub fn all_ids() -> Vec<&'static str> {
     RUNTIMES.iter().map(|runtime| runtime.id()).collect()
 }
