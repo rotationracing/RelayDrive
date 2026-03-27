@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::broadcast_protocol::protocol::PROTOCOL_VERSION;
 use byteorder::{LittleEndian, WriteBytesExt};
 use std::io::Write;

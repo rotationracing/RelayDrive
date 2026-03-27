@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 //! A simple, batteries-included client for the Broadcasting API
 
 use crate::broadcast_protocol::protocol::inbound::{

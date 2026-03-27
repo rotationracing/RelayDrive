@@ -419,7 +419,6 @@ mod platform {
         let mut last_emit = Instant::now();
         let mut buffer = [0u8; 131072]; // 128KB buffer for UDP packets (increased from 64KB)
         let mut is_registered = false;
-        let mut connection_id: Option<i32> = None;
         let mut consecutive_decode_failures = 0u32;
         const MAX_CONSECUTIVE_DECODE_FAILURES: u32 = 10;
         let mut broadcast_state = BroadcastState::new();
@@ -476,33 +475,31 @@ mod platform {
                                         broadcast_info!(
                                             "Successfully registered with ACC broadcast server."
                                         );
-                                        connection_id = Some(reg.connection_id as i32);
-                                        if let Some(conn_id) = connection_id {
-                                            if let Err(e) = send_simple_request(
-                                                &socket,
-                                                MSG_REQUEST_ENTRY_LIST,
-                                                conn_id,
-                                            ) {
-                                                broadcast_warn!(
-                                                    "Failed to send entry list request: {}",
-                                                    e
-                                                );
-                                            } else {
-                                                broadcast_info!("Sent entry list request");
-                                            }
+                                        let connection_id = reg.connection_id as i32;
+                                        if let Err(e) = send_simple_request(
+                                            &socket,
+                                            MSG_REQUEST_ENTRY_LIST,
+                                            connection_id,
+                                        ) {
+                                            broadcast_warn!(
+                                                "Failed to send entry list request: {}",
+                                                e
+                                            );
+                                        } else {
+                                            broadcast_info!("Sent entry list request");
+                                        }
 
-                                            if let Err(e) = send_simple_request(
-                                                &socket,
-                                                MSG_REQUEST_TRACK_DATA,
-                                                conn_id,
-                                            ) {
-                                                broadcast_warn!(
-                                                    "Failed to send track data request: {}",
-                                                    e
-                                                );
-                                            } else {
-                                                broadcast_info!("Sent track data request");
-                                            }
+                                        if let Err(e) = send_simple_request(
+                                            &socket,
+                                            MSG_REQUEST_TRACK_DATA,
+                                            connection_id,
+                                        ) {
+                                            broadcast_warn!(
+                                                "Failed to send track data request: {}",
+                                                e
+                                            );
+                                        } else {
+                                            broadcast_info!("Sent track data request");
                                         }
                                     }
 
@@ -668,7 +665,6 @@ mod platform {
                                 } else {
                                     broadcast_info!("Re-sent registration request as part of recovery");
                                     is_registered = false;
-                                    connection_id = None;
                                     consecutive_decode_failures = 0;
 
                                     // Emit a recovery status to the frontend
@@ -923,12 +919,12 @@ mod platform {
         pos += 4;
 
         // Read team_car_name (kstring) - always present in protocol
-        let (team_car_name, new_pos) = read_kstring(&buffer[pos..])
+        let (_team_car_name, new_pos) = read_kstring(&buffer[pos..])
             .map_err(|_| "Failed to read team_car_name".to_string())?;
         pos += new_pos;
 
         // Read display_name (kstring) - always present in protocol
-        let (display_name, new_pos) = read_kstring(&buffer[pos..])
+        let (_display_name, new_pos) = read_kstring(&buffer[pos..])
             .map_err(|_| "Failed to read display_name".to_string())?;
         pos += new_pos;
 
@@ -968,7 +964,7 @@ mod platform {
             }
             
             // Read driver_index (u16)
-            let driver_index = u16::from_le_bytes([buffer[pos], buffer[pos + 1]]);
+            let _driver_index = u16::from_le_bytes([buffer[pos], buffer[pos + 1]]);
             pos += 2;
             
             // Read has_driver_info (u8 boolean)

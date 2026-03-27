@@ -23,6 +23,6 @@
     "core:webview:default",
     "core:webview:allow-internal-toggle-devtools",
     "deep-link:default",
-    "shell:allow-open"
+    "opener:allow-open-url"
   ]
 }

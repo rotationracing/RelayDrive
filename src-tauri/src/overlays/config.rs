@@ -29,6 +29,7 @@ pub struct OverlayConfigItem {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct OverlayConfig {
+    #[allow(dead_code)]
     #[serde(default = "default_overlays_enabled", skip_serializing)]
     pub overlays_enabled: bool,
     pub overlays: BTreeMap<String, OverlayConfigItem>,
