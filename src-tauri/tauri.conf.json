@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "RelayDrive",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "identifier": "eu.rotationracing.relaydrive",
   "build": {
     "frontendDist": "../out",
@@ -32,7 +32,9 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis"],
+    "targets": [
+      "nsis"
+    ],
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
@@ -50,7 +52,10 @@
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["relaydrive", "relaydrive-dev"]
+        "schemes": [
+          "relaydrive",
+          "relaydrive-dev"
+        ]
       }
     },
     "updater": {
