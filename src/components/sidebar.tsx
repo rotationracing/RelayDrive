@@ -69,7 +69,7 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
 
   useEffect(() => {
     if (onboarding !== false) return;
-    
+
     const loadProfile = async () => {
       try {
         const profileData = await invoke<Profile>('get_profile')
@@ -212,10 +212,10 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
       // Get the current window using Tauri's window API
       const { getCurrentWindow } = await import('@tauri-apps/api/window');
       const window = getCurrentWindow();
-      
+
       // Pass the app handle to the backend
       await invoke('kill_process', { appHandle: { app: window } });
-      
+
       // Update the UI immediately
       setGameStatus('disconnected');
     } catch (error) {
@@ -308,11 +308,11 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   return (
     <div className="w-64 bg-card border-r border-border flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-border">
+      <div className="p-6 border-b border-border flex items-baseline gap-2">
         <div className="text-2xl font-bold">
           <span className="text-white">RelayDrive</span>
         </div>
-        <div className="text-xs text-muted-foreground mt-1">
+        <div className="text-xs text-muted-foreground">
           {`v${appVersion ?? "0.0.0"}`}
         </div>
       </div>
@@ -323,9 +323,8 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
           <Button
             key={item.id}
             variant={currentPage === item.id ? "secondary" : "ghost"}
-            className={`w-full justify-start rounded-app ${
-              currentPage === item.id ? "bg-red-accent/10 text-red-accent hover:bg-red-accent/20" : ""
-            }`}
+            className={`w-full justify-start rounded-app ${currentPage === item.id ? "bg-red-accent/10 text-red-accent hover:bg-red-accent/20" : ""
+              }`}
             onClick={() => navigate(item.id)}
           >
             <item.icon className="w-4 h-4 mr-3" />
@@ -361,15 +360,15 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="gap-2 sm:gap-0">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setIsConfirmDialogOpen(false)}
                 className="rounded-app"
               >
                 Cancel
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={handleKillProcess}
                 className="rounded-app bg-red-600 hover:bg-red-700"
               >
@@ -392,7 +391,7 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button 
+              <Button
                 onClick={() => setIsErrorModalOpen(false)}
                 className="rounded-app w-full"
               >

@@ -8,7 +8,9 @@ mod games;
 mod hotkeys;
 mod overlays;
 mod settings;
+mod setups;
 mod users;
+pub mod models;
 
 use app_state::AppState;
 use filesystem::create_game_dirs;
@@ -22,6 +24,7 @@ pub fn run() {
     builder = builder.plugin(tauri_plugin_deep_link::init());
     builder = builder.plugin(tauri_plugin_opener::init());
     builder = builder.plugin(tauri_plugin_global_shortcut::Builder::new().build());
+    builder = builder.plugin(tauri_plugin_dialog::init());
 
     #[cfg(desktop)]
     {
@@ -122,6 +125,16 @@ pub fn run() {
             settings::save_settings,
             settings::import_settings,
             settings::import_settings_json,
+            setups::get_acc_setups_path,
+            setups::list_acc_setups,
+            setups::read_setup_file,
+            setups::rename_setup_file,
+            setups::delete_setup_file,
+            setups::get_acc_cars,
+            setups::get_acc_tracks,
+            setups::prepare_setup_import,
+            setups::complete_setup_import,
+            setups::open_setup_file_dialog,
             hotkeys::register_global_shortcut,
             hotkeys::unregister_global_shortcut,
             hotkeys::unregister_all_global_shortcuts,

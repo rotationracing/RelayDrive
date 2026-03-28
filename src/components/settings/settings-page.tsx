@@ -53,6 +53,7 @@ type EditableSettings = {
   measurement_units: typeof CHOICE_METRIC
   hotkeys: Record<string, string | null>
   connectionSettings: GameConnectionSettings
+  setupPaths: { acc: string | null; iracing: string | null; lmu: string | null }
 }
 
 const GAME_OPTIONS = [
@@ -82,6 +83,7 @@ export function SettingsPage() {
         ...(globalSettings.hotkeys || {}),
       },
       connectionSettings: globalSettings.connectionSettings ?? DEFAULT_CONNECTION_SETTINGS,
+      setupPaths: globalSettings.setupPaths ?? { acc: null, iracing: null, lmu: null },
     }
 
     setSettings(loaded)
@@ -184,6 +186,29 @@ export function SettingsPage() {
       })
     } catch (error) {
       console.error("Failed to save hotkey setting:", error)
+    }
+  }
+
+  const handleSetupPathChange = async (
+    game: "acc" | "iracing" | "lmu",
+    value: string
+  ) => {
+    if (!settings || !globalSettings) return
+
+    const updatedPaths = {
+      ...settings.setupPaths,
+      [game]: value.trim() || null,
+    }
+
+    setSettings({ ...settings, setupPaths: updatedPaths })
+
+    try {
+      await persist({
+        ...globalSettings,
+        setupPaths: updatedPaths,
+      })
+    } catch (error) {
+      console.error("Failed to save setup path:", error)
     }
   }
 
@@ -347,6 +372,24 @@ export function SettingsPage() {
                 )
               })}
             </div>
+          </SettingsSection>
+
+          <SettingsSection eyebrow="Setups">
+            {GAME_OPTIONS.map((game) => (
+              <SettingsRow
+                key={game.value}
+                title={`${game.label} setups path`}
+                description="Leave empty to use the default location."
+                control={
+                  <Input
+                    value={settings.setupPaths[game.value] ?? ""}
+                    onChange={(e) => handleSetupPathChange(game.value, e.target.value)}
+                    placeholder="Default"
+                    className={controlClassName}
+                  />
+                }
+              />
+            ))}
           </SettingsSection>
         </div>
       </div>

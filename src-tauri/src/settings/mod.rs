@@ -176,6 +176,24 @@ impl Default for GameConnectionSettings {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct SetupPaths {
+    pub acc: Option<String>,
+    pub iracing: Option<String>,
+    pub lmu: Option<String>,
+}
+
+impl Default for SetupPaths {
+    fn default() -> Self {
+        Self {
+            acc: None,
+            iracing: None,
+            lmu: None,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct SettingsData {
     pub check_for_updates: bool,
     pub language: String,
@@ -189,6 +207,8 @@ pub struct SettingsData {
     pub data_share_consent: bool,
     #[serde(default)]
     pub pro_subscription_plan: Option<String>,
+    #[serde(default)]
+    pub setup_paths: SetupPaths,
 }
 
 impl Default for SettingsData {
@@ -205,6 +225,7 @@ impl Default for SettingsData {
             connection_settings: GameConnectionSettings::default(),
             data_share_consent: false,
             pro_subscription_plan: None,
+            setup_paths: SetupPaths::default(),
         }
     }
 }

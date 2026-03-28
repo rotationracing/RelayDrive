@@ -13,6 +13,7 @@ export default function ACCLayout({ children }: { children: React.ReactNode }) {
 
   const currentPage: Page = useMemo(() => {
     if (!pathname) return "home"
+    if (pathname.startsWith("/acc/setup")) return "setup"
     if (pathname.startsWith("/acc/overlay")) return "overlay"
     if (pathname.startsWith("/acc/console")) return "console"
     if (pathname.startsWith("/acc/settings")) return "settings"

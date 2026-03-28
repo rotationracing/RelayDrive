@@ -159,6 +159,12 @@ export interface GameConnectionSettings {
   lmu: ConnectionDetails
 }
 
+export interface SetupPaths {
+  acc: string | null
+  iracing: string | null
+  lmu: string | null
+}
+
 export interface SettingsData {
   // Tauri v2 maps Rust snake_case => camelCase on JS bridge
   checkForUpdates: boolean
@@ -168,6 +174,7 @@ export interface SettingsData {
   connectionSettings: GameConnectionSettings
   dataShareConsent?: boolean
   proSubscriptionPlan?: "pro" | "free" | null
+  setupPaths?: SetupPaths
 }
 
 export async function getSettings() {
@@ -334,4 +341,84 @@ export async function unregisterGlobalShortcut(shortcut: string) {
 
 export async function unregisterAllGlobalShortcuts() {
   return invoke('unregister_all_global_shortcuts')
+}
+
+// Setup management
+export interface SetupEntry {
+  carId: string
+  trackId: string
+  filename: string
+  fullPath: string
+}
+
+export interface CarInfo {
+  id: string
+  prettyName: string
+  fullName: string
+  brandName: string
+}
+
+export interface TrackInfo {
+  id: string
+  prettyName: string
+  fullName: string
+  country: string
+}
+
+export async function getAccSetupsPath() {
+  return invoke<string>('get_acc_setups_path')
+}
+
+export async function listAccSetups() {
+  return invoke<SetupEntry[]>('list_acc_setups')
+}
+
+export async function readSetupFile(path: string) {
+  return invoke<string>('read_setup_file', { path })
+}
+
+export async function renameSetupFile(path: string, newName: string) {
+  return invoke<string>('rename_setup_file', { path, newName })
+}
+
+export async function deleteSetupFile(path: string) {
+  return invoke('delete_setup_file', { path })
+}
+
+export async function getAccCars() {
+  return invoke<CarInfo[]>('get_acc_cars')
+}
+
+export async function getAccTracks() {
+  return invoke<TrackInfo[]>('get_acc_tracks')
+}
+
+export interface SetupImportData {
+  carId: string
+  carName: string
+  carInfo?: CarInfo | null
+  fileName: string
+  fileContent: string
+}
+
+export async function prepareSetupImport(fileName: string, fileContent: string) {
+  return invoke<SetupImportData>('prepare_setup_import', { fileName, fileContent })
+}
+
+export async function completeSetupImport(
+  carId: string,
+  trackId: string,
+  fileName: string,
+  fileContent: string,
+) {
+  return invoke<string>('complete_setup_import', {
+    carId,
+    trackId,
+    fileName,
+    fileContent,
+  })
+}
+
+export async function openSetupFileDialog() {
+  return invoke<string | null>('open_setup_file_dialog')
 }
