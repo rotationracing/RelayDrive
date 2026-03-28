@@ -9,6 +9,7 @@ mod hotkeys;
 mod overlays;
 mod settings;
 mod setups;
+mod setup_share;
 mod users;
 pub mod models;
 
@@ -126,6 +127,8 @@ pub fn run() {
             settings::import_settings,
             settings::import_settings_json,
             setups::get_acc_setups_path,
+            setups::get_iracing_setups_path,
+            setups::get_lmu_setups_path,
             setups::list_acc_setups,
             setups::read_setup_file,
             setups::rename_setup_file,
@@ -135,6 +138,8 @@ pub fn run() {
             setups::prepare_setup_import,
             setups::complete_setup_import,
             setups::open_setup_file_dialog,
+            setup_share::share_setup,
+            setup_share::lookup_setup,
             hotkeys::register_global_shortcut,
             hotkeys::unregister_global_shortcut,
             hotkeys::unregister_all_global_shortcuts,

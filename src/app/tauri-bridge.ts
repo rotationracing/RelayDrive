@@ -373,6 +373,14 @@ export async function getAccSetupsPath() {
   return invoke<string>("get_acc_setups_path");
 }
 
+export async function getIracingSetupsPath() {
+  return invoke<string>("get_iracing_setups_path");
+}
+
+export async function getLmuSetupsPath() {
+  return invoke<string>("get_lmu_setups_path");
+}
+
 export async function listAccSetups() {
   return invoke<SetupEntry[]>("list_acc_setups");
 }
@@ -425,4 +433,37 @@ export async function completeSetupImport(
 
 export async function openSetupFileDialog() {
   return invoke<string | null>("open_setup_file_dialog");
+}
+
+// Setup sharing API
+export interface ShareSetupResponse {
+  code: string;
+  expiresAt: string;
+}
+
+export async function shareSetup(
+  bearerToken: string,
+  fileName: string,
+  setupJson: string,
+) {
+  return invoke<ShareSetupResponse>("share_setup", {
+    bearerToken,
+    fileName,
+    setupJson,
+  });
+}
+
+export interface LookupShareResponse {
+  username: string;
+  displayName: string;
+  fileName: string;
+  setupJson: string;
+  expiresAt: string;
+}
+
+export async function lookupSetup(bearerToken: string, code: string) {
+  return invoke<LookupShareResponse>("lookup_setup", {
+    bearerToken,
+    code,
+  });
 }

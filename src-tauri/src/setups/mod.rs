@@ -49,6 +49,46 @@ pub async fn get_acc_setups_path(app: AppHandle) -> Result<String, String> {
     resolve_acc_setups_path(&app)
 }
 
+fn resolve_iracing_setups_path(app: &AppHandle) -> Result<String, String> {
+    let settings = crate::settings::load_settings_sync(app).unwrap_or_default();
+    if let Some(custom_path) = &settings.setup_paths.iracing {
+        if !custom_path.trim().is_empty() {
+            return Ok(custom_path.clone());
+        }
+    }
+    let docs = dirs::document_dir().ok_or("Could not find Documents directory")?;
+    let path = docs
+        .join("iRacing")
+        .join("setups");
+    Ok(path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+pub async fn get_iracing_setups_path(app: AppHandle) -> Result<String, String> {
+    resolve_iracing_setups_path(&app)
+}
+
+fn resolve_lmu_setups_path(app: &AppHandle) -> Result<String, String> {
+    let settings = crate::settings::load_settings_sync(app).unwrap_or_default();
+    if let Some(custom_path) = &settings.setup_paths.lmu {
+        if !custom_path.trim().is_empty() {
+            return Ok(custom_path.clone());
+        }
+    }
+    let docs = dirs::document_dir().ok_or("Could not find Documents directory")?;
+    let path = docs
+        .join("Le Mans Ultimate")
+        .join("UserData")
+        .join("player")
+        .join("Settings");
+    Ok(path.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+pub async fn get_lmu_setups_path(app: AppHandle) -> Result<String, String> {
+    resolve_lmu_setups_path(&app)
+}
+
 #[tauri::command]
 pub async fn list_acc_setups(app: AppHandle) -> Result<Vec<SetupEntry>, String> {
     let base = resolve_acc_setups_path(&app)?;

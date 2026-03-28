@@ -152,10 +152,24 @@ export function CrewSync() {
           <div className="text-center py-4">
             <Users className="w-8 h-8 mx-auto mb-2 opacity-50 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-3">No active session</p>
-            <Button onClick={createCrewSession} variant="outline" className="rounded-app">
-              <UserPlus className="w-4 h-4 mr-2" />
-              Create Session
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="rounded-app">
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Create Session
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="rounded-[var(--radius-2xl)] sm:max-w-xs text-center border-border bg-card">
+                <DialogHeader className="flex flex-col items-center">
+                  <DialogTitle>Crew Sessions</DialogTitle>
+                  <DialogDescription>Feature Work in Progress</DialogDescription>
+                </DialogHeader>
+                <div className="py-6 flex flex-col items-center justify-center text-muted-foreground">
+                  <Users className="w-12 h-12 mb-3 opacity-30" />
+                  <p className="text-sm">We are currently building this feature. Please check back later!</p>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </TooltipProvider>
@@ -184,7 +198,7 @@ export function CrewSync() {
                 <Settings className="w-3 h-3" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-app max-w-md">
+            <DialogContent className="rounded-[var(--radius-2xl)] max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center">
                   <Users className="w-5 h-5 mr-2" />

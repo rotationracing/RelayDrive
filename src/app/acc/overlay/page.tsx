@@ -4,8 +4,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import { useOverlaySessionStore } from "@/stores/overlay-session-store";
 import { getOverlayModules } from "./overlay-registry";
-import { OverlayPageHeader } from "@/components/overlay/overlay-page-header";
-import { OverlayPresetsCard } from "@/components/overlay/overlay-presets-card";
 import { OverlaySidebar } from "@/components/overlay/overlay-sidebar";
 import { OverlaySettingsPanel } from "@/components/overlay/overlay-settings-panel";
 import { CreatePresetDialog } from "@/components/overlay/create-preset-dialog";
@@ -312,50 +310,41 @@ export default function Page() {
   };
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-6xl flex-col gap-6 overflow-hidden px-6 py-6 md:px-8 md:py-8">
-      <div className="flex-shrink-0 flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <OverlayPageHeader />
-        <div className="w-full md:w-auto pb-1 md:pb-0">
-          <OverlayPresetsCard
-            overlaysEnabled={overlaysEnabled}
-            onToggleOverlaysEnabled={handleToggleOverlaysEnabled}
-            selectedPreset={configHook.selectedPreset}
-            availableConfigs={configHook.availableConfigs}
-            onSelectPreset={configHook.loadPreset}
-            onCreatePreset={() => setCreatePresetOpen(true)}
-            onResetDefault={handleResetDefault}
-            onDeletePreset={handleDeletePreset}
-            onExportConfig={handleExportConfig}
-            onImportConfig={handleImportConfig}
-            overlaysEnabledHotkey={settings?.hotkeys?.toggle_overlays_enabled ?? undefined}
-            editMode={editMode}
-            onToggleEditMode={toggleEditMode}
-            editModeHotkey={settings?.hotkeys?.toggle_overlay_edit_mode ?? undefined}
-            highlightPower={highlightPower}
-          />
-        </div>
-      </div>
+    <div className="flex h-full">
+      {/* Sidebar */}
+      <OverlaySidebar
+        overlays={overlays}
+        activeId={activeId}
+        onSelect={setActiveId}
+        query={query}
+        onQueryChange={setQuery}
+        editMode={editMode}
+        onToggleOverlay={handleToggleOverlayWithHighlight}
+        onDragStart={startDrag}
+        onDrop={onDrop}
+        overlaysEnabled={overlaysEnabled}
+        onToggleOverlaysEnabled={handleToggleOverlaysEnabled}
+        overlaysEnabledHotkey={settings?.hotkeys?.toggle_overlays_enabled ?? undefined}
+        onToggleEditMode={toggleEditMode}
+        editModeHotkey={settings?.hotkeys?.toggle_overlay_edit_mode ?? undefined}
+        highlightPower={highlightPower}
+        selectedPreset={configHook.selectedPreset}
+        availableConfigs={configHook.availableConfigs}
+        onSelectPreset={configHook.loadPreset}
+        onCreatePreset={() => setCreatePresetOpen(true)}
+        onResetDefault={handleResetDefault}
+        onDeletePreset={handleDeletePreset}
+        onExportConfig={handleExportConfig}
+        onImportConfig={handleImportConfig}
+      />
 
-      <div className="flex-1 flex min-h-0 overflow-hidden rounded-[var(--radius-2xl)] border border-border bg-card shadow-sm">
-        <OverlaySidebar
-          overlays={overlays}
-          activeId={activeId}
-          onSelect={setActiveId}
-          query={query}
-          onQueryChange={setQuery}
-          editMode={editMode}
-          onToggleOverlay={handleToggleOverlayWithHighlight}
-          onDragStart={startDrag}
-          onDrop={onDrop}
+      {/* Content */}
+      <div className="flex-1 flex flex-col min-h-0">
+        <OverlaySettingsPanel
+          activeOverlay={activeOverlay}
+          moduleMap={moduleMap}
+          updateOverlay={updateOverlay}
         />
-
-        <div className="flex-1 h-full min-w-0 bg-background/30">
-          <OverlaySettingsPanel
-            activeOverlay={activeOverlay}
-            moduleMap={moduleMap}
-            updateOverlay={updateOverlay}
-          />
-        </div>
       </div>
 
       <CreatePresetDialog

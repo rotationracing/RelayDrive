@@ -41,12 +41,9 @@ export function OverlaySettingsPanel({
 
   if (!activeOverlay) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-muted-foreground p-8 bg-transparent">
-        <MousePointer2 className="h-12 w-12 mb-4 opacity-20" />
-        <p className="text-lg font-medium">No Overlay Selected</p>
-        <p className="text-sm opacity-70">
-          Select an overlay from the sidebar to configure its settings.
-        </p>
+      <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
+        <MousePointer2 className="h-12 w-12 mb-3 opacity-30" />
+        <p className="text-sm font-medium">Select an overlay to configure</p>
       </div>
     );
   }
@@ -127,7 +124,7 @@ export function OverlaySettingsPanel({
 
   return (
     <div className="flex flex-col h-full bg-transparent">
-      <div className="px-4 border-b border-border md:px-5 h-[61px] flex items-center justify-between shrink-0">
+      <div className="px-4 pt-9 pb-3 border-b border-border md:px-5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-4">
           <h2 className="text-base font-semibold">{activeOverlay.title}</h2>
           <div className="h-4 w-px bg-border/60" />

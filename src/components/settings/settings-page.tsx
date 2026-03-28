@@ -85,6 +85,11 @@ export function SettingsPage() {
   const [unitsMode, setUnitsMode] = useState<UnitsMode>("metric");
   const [unitsModalOpen, setUnitsModalOpen] = useState(false);
   const [activeConnectionGame, setActiveConnectionGame] = useState<GameConnectionKey | null>(null);
+  const [defaultPaths, setDefaultPaths] = useState<Record<string, string>>({
+    acc: "",
+    iracing: "",
+    lmu: "",
+  });
 
   useEffect(() => {
     if (!globalSettings) return;
@@ -105,6 +110,26 @@ export function SettingsPage() {
     setSettings(loaded);
     setUnitsMode(inferUnitsModeFromChoice(loaded.measurement_units));
   }, [globalSettings]);
+
+  useEffect(() => {
+    async function loadDefaultPaths() {
+      if (!settings) return;
+      try {
+        const { getAccSetupsPath, getIracingSetupsPath, getLmuSetupsPath } = await import(
+          "@/app/tauri-bridge"
+        );
+        const [acc, iracing, lmu] = await Promise.all([
+          getAccSetupsPath(),
+          getIracingSetupsPath(),
+          getLmuSetupsPath(),
+        ]);
+        setDefaultPaths({ acc, iracing, lmu });
+      } catch (err) {
+        console.error("Failed to load default setup paths:", err);
+      }
+    }
+    loadDefaultPaths();
+  }, [settings?.setupPaths]);
 
   const handleLanguageChange = async (value: string) => {
     if (!settings || !globalSettings) return;
@@ -397,7 +422,7 @@ export function SettingsPage() {
                   <Input
                     value={settings.setupPaths[game.value] ?? ""}
                     onChange={(e) => handleSetupPathChange(game.value, e.target.value)}
-                    placeholder="Default"
+                    placeholder={defaultPaths[game.value] || "Default"}
                     className={controlClassName}
                   />
                 }

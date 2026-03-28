@@ -1,6 +1,6 @@
 "use client";
 
-import type { CarInfo, SetupEntry, TrackInfo, SetupImportData } from "@/app/tauri-bridge";
+import type { CarInfo, SetupEntry, TrackInfo, SetupImportData, LookupShareResponse } from "@/app/tauri-bridge";
 import {
   completeSetupImport,
   deleteSetupFile,
@@ -11,6 +11,9 @@ import {
   prepareSetupImport,
   readSetupFile,
   renameSetupFile,
+  shareSetup,
+  lookupSetup,
+  getAuth,
 } from "@/app/tauri-bridge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +32,7 @@ import {
   ChevronDown,
   ChevronRight,
   CircleDot,
+  Edit2,
   FileJson,
   FileUp,
   Folder,
@@ -43,10 +47,12 @@ import {
   Search,
   Share2,
   Shield,
+  Copy,
+  CheckCircle2,
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface CarSetups {
@@ -98,6 +104,13 @@ function SetupPage() {
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [newName, setNewName] = useState("");
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareCode, setShareCode] = useState<string | null>(null);
+  const [shareExpires, setShareExpires] = useState<string | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [isCodeCopied, setIsCodeCopied] = useState(false);
+  const [editingCard, setEditingCard] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importStep, setImportStep] = useState<"source" | "destination">("source");
   const [importMode, setImportMode] = useState<"file" | "code">("file");
@@ -276,7 +289,6 @@ function SetupPage() {
 
   const refresh = useCallback(async () => {
     await loadData();
-    toast.success("Setups refreshed");
   }, [loadData]);
 
   const resetImportFlow = useCallback(() => {
@@ -343,6 +355,107 @@ function SetupPage() {
     }
   }, [handleImportDialogChange, importData, importSetupName, loadData, selectedTrack]);
 
+  const handleShareSetup = useCallback(async () => {
+    if (!selectedSetup) return;
+
+    setIsSharing(true);
+    try {
+      const auth = await getAuth();
+      if (!auth) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const response = await shareSetup(
+        auth.token,
+        selectedSetup.filename,
+        setupContent,
+      );
+      setShareCode(response.code);
+      setShareExpires(response.expiresAt);
+      setIsShareOpen(true);
+    } catch (e) {
+      console.error("Failed to share setup:", e);
+      toast.error(`Failed to share setup: ${e}`);
+    } finally {
+      setIsSharing(false);
+    }
+  }, [selectedSetup, setupContent]);
+
+  const handleImportCode = useCallback(async () => {
+    if (importCode.length !== 4) {
+      toast.error("Please enter a valid 4-digit code");
+      return;
+    }
+
+    try {
+      const auth = await getAuth();
+      if (!auth) {
+        toast.error("Not authenticated");
+        return;
+      }
+
+      const result = await lookupSetup(auth.token, importCode);
+      await loadImportData(result.fileName, result.setupJson);
+    } catch (e) {
+      console.error("Failed to lookup setup:", e);
+      toast.error(`Failed to import: ${e}`);
+    }
+  }, [importCode, loadImportData]);
+
+  const handleEditCard = (cardId: string, currentValue: string) => {
+    setEditingCard(cardId);
+    // Extract just the number from the display value (e.g., "10L" -> "10")
+    const numValue = currentValue.replace(/[^\d.-]/g, "");
+    setEditValue(numValue);
+  };
+
+  const saveCardEdit = useCallback(
+    (cardId: string) => {
+      if (!setupContent || !editValue) {
+        setEditingCard(null);
+        return;
+      }
+
+      try {
+        const updated = JSON.parse(setupContent);
+        const numVal = parseFloat(editValue);
+
+        if (isNaN(numVal)) {
+          setEditingCard(null);
+          return;
+        }
+
+        if (cardId === "fuel") {
+          if (updated.basicSetup?.strategy) {
+            updated.basicSetup.strategy.fuel = numVal;
+          }
+        } else if (cardId === "abs") {
+          if (updated.basicSetup?.electronics) {
+            updated.basicSetup.electronics.abs = numVal;
+          }
+        } else if (cardId === "tc1") {
+          if (updated.basicSetup?.electronics) {
+            updated.basicSetup.electronics.tC1 = numVal;
+          }
+        } else if (cardId === "tc2") {
+          if (updated.basicSetup?.electronics) {
+            updated.basicSetup.electronics.tC2 = numVal;
+          }
+        }
+
+        setSetupContent(JSON.stringify(updated));
+        setEditingCard(null);
+      } catch (e) {
+        console.error("Failed to save card edit:", e);
+        setEditingCard(null);
+      }
+    },
+    [setupContent],
+  );
+
+
+
   const selectedImportTrack = selectedTrack
     ? (trackMap.get(normalizeId(selectedTrack)) ?? null)
     : null;
@@ -408,19 +521,19 @@ function SetupPage() {
                       className="flex items-center gap-1.5 w-full px-3 py-1.5 text-left text-xs font-medium hover:bg-accent/50 transition-colors"
                       onClick={() => toggleCar(carSetups.car.id)}
                     >
-                      {isCarExpanded ? (
-                        <ChevronDown className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      )}
+                      <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground shrink-0 transition-transform duration-200 ${isCarExpanded ? "rotate-90" : ""}`} />
                       <span className="truncate">
                         <span className="text-muted-foreground">{carSetups.car.brandName}</span>{" "}
                         {carSetups.car.prettyName}
                       </span>
                     </button>
 
-                    {isCarExpanded &&
-                      Array.from(carSetups.tracks.entries())
+                    <div
+                      className="grid transition-[grid-template-rows] duration-200 ease-out"
+                      style={{ gridTemplateRows: isCarExpanded ? "1fr" : "0fr" }}
+                    >
+                      <div className="overflow-hidden">
+                      {Array.from(carSetups.tracks.entries())
                         .sort(([a], [b]) => a.localeCompare(b))
                         .map(([trackId, trackSetups]) => {
                           const trackKey = `${carSetups.car.id}::${trackId}`;
@@ -442,8 +555,12 @@ function SetupPage() {
                                 </span>
                               </button>
 
-                              {isTrackExpanded &&
-                                trackSetups
+                              <div
+                                className="grid transition-[grid-template-rows] duration-200 ease-out"
+                                style={{ gridTemplateRows: isTrackExpanded ? "1fr" : "0fr" }}
+                              >
+                                <div className="overflow-hidden">
+                                {trackSetups
                                   .sort((a, b) => a.filename.localeCompare(b.filename))
                                   .map((setup) => {
                                     const isSelected = selectedSetup?.fullPath === setup.fullPath;
@@ -451,25 +568,27 @@ function SetupPage() {
                                       <button
                                         type="button"
                                         key={setup.fullPath}
-                                        className={`flex items-center gap-1.5 w-full pl-12 pr-3 py-1.5 text-left text-xs transition-colors ${
-                                          isSelected
+                                        className={`flex items-center gap-1.5 w-full pl-12 pr-3 py-1.5 text-left text-xs transition-colors ${isSelected
                                             ? "bg-red-accent/10 text-red-accent"
                                             : "hover:bg-accent/50 text-foreground"
-                                        }`}
+                                          }`}
                                         onClick={() => selectSetup(setup)}
                                       >
                                         <FileJson
-                                          className={`w-3.5 h-3.5 shrink-0 ${
-                                            isSelected ? "text-red-accent" : "text-muted-foreground"
-                                          }`}
+                                          className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-red-accent" : "text-muted-foreground"
+                                            }`}
                                         />
                                         <span className="truncate">{setup.filename}</span>
                                       </button>
                                     );
                                   })}
+                                </div>
+                              </div>
                             </div>
                           );
                         })}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -530,11 +649,16 @@ function SetupPage() {
                     </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon-sm" disabled>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={handleShareSetup}
+                          disabled={isSharing}
+                        >
                           <Share2 className="w-3.5 h-3.5" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent side="bottom">Share (coming soon)</TooltipContent>
+                      <TooltipContent side="bottom">Share</TooltipContent>
                     </Tooltip>
                   </div>
                 </div>
@@ -543,6 +667,7 @@ function SetupPage() {
                 {parsedSetup && (
                   <div className="grid grid-cols-4 border-t border-border">
                     <QuickCard
+                      id="fuel"
                       icon={<Fuel className="w-4 h-4" />}
                       label="Fuel"
                       value={
@@ -550,21 +675,70 @@ function SetupPage() {
                           ? `${parsedSetup.basicSetup.strategy.fuel}L`
                           : "—"
                       }
+                      isEditing={editingCard === "fuel"}
+                      editValue={editValue}
+                      onEditChange={setEditValue}
+                      onEdit={() =>
+                        handleEditCard(
+                          "fuel",
+                          parsedSetup.basicSetup?.strategy?.fuel != null
+                            ? `${parsedSetup.basicSetup.strategy.fuel}L`
+                            : "—",
+                        )
+                      }
+                      onSave={() => saveCardEdit("fuel")}
+                      onCancel={() => setEditingCard(null)}
                     />
                     <QuickCard
+                      id="abs"
                       icon={<Shield className="w-4 h-4" />}
                       label="ABS"
                       value={parsedSetup.basicSetup?.electronics?.abs?.toString() ?? "—"}
+                      isEditing={editingCard === "abs"}
+                      editValue={editValue}
+                      onEditChange={setEditValue}
+                      onEdit={() =>
+                        handleEditCard(
+                          "abs",
+                          parsedSetup.basicSetup?.electronics?.abs?.toString() ?? "—",
+                        )
+                      }
+                      onSave={() => saveCardEdit("abs")}
+                      onCancel={() => setEditingCard(null)}
                       border
                     />
                     <QuickCard
+                      id="tc1"
                       label="TC1"
                       value={parsedSetup.basicSetup?.electronics?.tC1?.toString() ?? "—"}
+                      isEditing={editingCard === "tc1"}
+                      editValue={editValue}
+                      onEditChange={setEditValue}
+                      onEdit={() =>
+                        handleEditCard(
+                          "tc1",
+                          parsedSetup.basicSetup?.electronics?.tC1?.toString() ?? "—",
+                        )
+                      }
+                      onSave={() => saveCardEdit("tc1")}
+                      onCancel={() => setEditingCard(null)}
                       border
                     />
                     <QuickCard
+                      id="tc2"
                       label="TC2"
                       value={parsedSetup.basicSetup?.electronics?.tC2?.toString() ?? "—"}
+                      isEditing={editingCard === "tc2"}
+                      editValue={editValue}
+                      onEditChange={setEditValue}
+                      onEdit={() =>
+                        handleEditCard(
+                          "tc2",
+                          parsedSetup.basicSetup?.electronics?.tC2?.toString() ?? "—",
+                        )
+                      }
+                      onSave={() => saveCardEdit("tc2")}
+                      onCancel={() => setEditingCard(null)}
                       border
                     />
                   </div>
@@ -587,7 +761,6 @@ function SetupPage() {
           <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground">
             <SlidersHorizontal className="w-12 h-12 mb-3 opacity-30" />
             <p className="text-sm font-medium">Select a setup to view</p>
-            <p className="text-xs mt-1">Choose a setup file from the sidebar</p>
           </div>
         )}
       </div>
@@ -692,9 +865,7 @@ function SetupPage() {
                       size="sm"
                       className="w-full text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 disabled:opacity-20"
                       disabled={importCode.length !== 4}
-                      onClick={() =>
-                        toast.info("Code import will be wired in when sharing is implemented.")
-                      }
+                      onClick={handleImportCode}
                     >
                       Continue
                     </Button>
@@ -773,16 +944,14 @@ function SetupPage() {
                           type="button"
                           key={track.id}
                           onClick={() => setSelectedTrack(track.id)}
-                          className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${
-                            isSelected
+                          className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left transition-colors ${isSelected
                               ? "bg-red-accent/10 text-red-accent ring-1 ring-inset ring-red-accent/20"
                               : "hover:bg-accent text-foreground/80 hover:text-foreground"
-                          }`}
+                            }`}
                         >
                           <div
-                            className={`p-1.5 rounded-md ${
-                              isSelected ? "bg-red-accent/20" : "bg-muted text-muted-foreground"
-                            }`}
+                            className={`p-1.5 rounded-md ${isSelected ? "bg-red-accent/20" : "bg-muted text-muted-foreground"
+                              }`}
                           >
                             <MapPinned className="h-3.5 w-3.5" />
                           </div>
@@ -832,31 +1001,136 @@ function SetupPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Share dialog */}
+      <Dialog open={isShareOpen} onOpenChange={setIsShareOpen}>
+        <DialogContent className="sm:max-w-md rounded-[var(--radius-2xl)] border-border bg-card" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Setup Shared</DialogTitle>
+            <DialogDescription>
+              {shareCode ? "Your setup has been shared. Share this code with others:" : "Generating share code..."}
+            </DialogDescription>
+          </DialogHeader>
+          {shareCode && (
+            <div className="space-y-4">
+              <div className="bg-secondary rounded-lg p-4 text-center">
+                <div className="text-3xl font-mono font-bold text-foreground tracking-wider">
+                  {shareCode}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Button
+                  className={`w-full transition-all duration-300 ${isCodeCopied ? "bg-green-600 hover:bg-green-600 text-white" : ""}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareCode);
+                    setIsCodeCopied(true);
+                    setTimeout(() => setIsCodeCopied(false), 2000);
+                  }}
+                >
+                  {isCodeCopied ? (
+                    <><CheckCircle2 className="size-4 mr-2" /> Copied!</>
+                  ) : (
+                    <><Copy className="size-4 mr-2" /> Copy Code</>
+                  )}
+                </Button>
+              </div>
+              {shareExpires && (
+                <div className="text-xs text-muted-foreground text-center">
+                  Expires: {new Date(shareExpires).toLocaleString()}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 function QuickCard({
+  id,
   icon,
   label,
   value,
   border,
+  isEditing,
+  editValue,
+  onEditChange,
+  onEdit,
+  onSave,
+  onCancel,
 }: {
+  id: string;
   icon?: React.ReactNode;
   label: string;
   value: string;
   border?: boolean;
+  isEditing: boolean;
+  editValue: string;
+  onEditChange: (val: string) => void;
+  onEdit: () => void;
+  onSave: () => void;
+  onCancel: () => void;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isEditing]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      onSave();
+    } else if (e.key === "Escape") {
+      onCancel();
+    }
+  };
+
+  const handleBlur = () => {
+    onSave();
+  };
+
   return (
-    <div className={`flex items-center gap-3 px-4 py-3 ${border ? "border-l border-border" : ""}`}>
+    <button
+      onClick={!isEditing && value !== "—" ? onEdit : undefined}
+      className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left group ${border ? "border-l border-border" : ""
+        } ${isEditing
+          ? "bg-secondary/30"
+          : value !== "—"
+            ? "hover:bg-secondary/10"
+            : ""
+        } ${!isEditing && value !== "—" ? "cursor-pointer" : ""}`}
+    >
       {icon && <div className="text-muted-foreground">{icon}</div>}
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
           {label}
         </div>
-        <div className="text-lg font-bold tabular-nums leading-tight">{value}</div>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            type="text"
+            inputMode="decimal"
+            value={editValue}
+            onChange={(e) => onEditChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className="text-lg font-bold tabular-nums leading-tight bg-transparent border-b border-primary outline-none w-full"
+            onClick={(e) => e.stopPropagation()}
+          />
+        ) : (
+          <div className="text-lg font-bold tabular-nums leading-tight">{value}</div>
+        )}
       </div>
-    </div>
+      {!isEditing && value !== "—" && (
+        <div className="shrink-0 p-1.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+          <Edit2 className="w-3.5 h-3.5" />
+        </div>
+      )}
+    </button>
   );
 }
 
