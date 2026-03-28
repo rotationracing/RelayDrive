@@ -21,9 +21,9 @@
 
 **RelayDrive** is an overlay and telemetry application for:
 
-* Assetto Corsa Competizione
-* iRacing
-* Le Mans Ultimate
+- Assetto Corsa Competizione
+- iRacing
+- Le Mans Ultimate
 
 The app delivers real-time telemetry and overlay features directly to your game. This repository contains the source code of the app only. Server-side code, including cloud processing, public leaderboards, and shared telemetry, is a premium feature and is not open source.
 
@@ -41,7 +41,7 @@ The compiled app.exe from the installer is identical to building from source. Pr
 
 > [!WARNING]
 > RelayDrive is currently in **Alpha**. Development is active and iterative, with frequent large updates.
-During this stage, **pull requests are not accepted**. Contributions will open in the **Beta** phase.
+> During this stage, **pull requests are not accepted**. Contributions will open in the **Beta** phase.
 
 ---
 
@@ -53,8 +53,8 @@ During this stage, **pull requests are not accepted**. Contributions will open i
 
 ### Requirements
 
-* [Bun](https://bun.sh)
-* [Rust](https://www.rust-lang.org/tools/install)
+- [Bun](https://bun.sh)
+- [Rust](https://www.rust-lang.org/tools/install)
 
 ### BETA
 
@@ -93,10 +93,10 @@ bun run tauri:build
 
 ## Support
 
-* [Documentation](https://relaydrive.rotationracing.eu/docs/)
-* [Status Page](https://status.rotationracing.eu)
-* [Join Discord](https://discord.gg/tXMAbRChWn) for community help
-* For **account or payment** issues: [support@rotationracing.eu](mailto:support@rotationracing.eu)
+- [Documentation](https://relaydrive.rotationracing.eu/docs/)
+- [Status Page](https://status.rotationracing.eu)
+- [Join Discord](https://discord.gg/tXMAbRChWn) for community help
+- For **account or payment** issues: [support@rotationracing.eu](mailto:support@rotationracing.eu)
 
 ---
 

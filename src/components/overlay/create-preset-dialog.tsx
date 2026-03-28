@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,15 +8,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface CreatePresetDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  presetName: string
-  onPresetNameChange: (name: string) => void
-  onSave: () => Promise<void>
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  presetName: string;
+  onPresetNameChange: (name: string) => void;
+  onSave: () => Promise<void>;
 }
 
 export function CreatePresetDialog({
@@ -27,9 +27,9 @@ export function CreatePresetDialog({
   onSave,
 }: CreatePresetDialogProps) {
   const handleSave = async () => {
-    await onSave()
-    onOpenChange(false)
-  }
+    await onSave();
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -37,7 +37,9 @@ export function CreatePresetDialog({
         <DialogHeader>
           <div className="border-b border-border px-6 py-5">
             <DialogTitle>Save new preset</DialogTitle>
-            <DialogDescription className="mt-2">Enter a name to save the current overlay layout.</DialogDescription>
+            <DialogDescription className="mt-2">
+              Enter a name to save the current overlay layout.
+            </DialogDescription>
           </div>
         </DialogHeader>
         <div className="px-6 py-4">
@@ -49,7 +51,11 @@ export function CreatePresetDialog({
           />
         </div>
         <DialogFooter className="px-6 pb-5 pt-0">
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-[var(--radius-lg)]">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="rounded-[var(--radius-lg)]"
+          >
             Cancel
           </Button>
           <Button
@@ -62,6 +68,5 @@ export function CreatePresetDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

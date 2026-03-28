@@ -1,14 +1,14 @@
-import { create } from "zustand"
+import { create } from "zustand";
 
 interface HotkeyAction {
-  id: string
-  action: () => void | Promise<void>
+  id: string;
+  action: () => void | Promise<void>;
 }
 
 interface HotkeyState {
-  registeredActions: Map<string, HotkeyAction>
-  registerAction: (hotkeyId: string, action: () => void | Promise<void>) => () => void
-  triggerAction: (hotkeyId: string) => void
+  registeredActions: Map<string, HotkeyAction>;
+  registerAction: (hotkeyId: string, action: () => void | Promise<void>) => () => void;
+  triggerAction: (hotkeyId: string) => void;
 }
 
 /**
@@ -20,28 +20,27 @@ export const useHotkeyStore = create<HotkeyState>((set, get) => ({
 
   registerAction: (hotkeyId: string, action: () => void | Promise<void>) => {
     set((state) => {
-      const newActions = new Map(state.registeredActions)
-      newActions.set(hotkeyId, { id: hotkeyId, action })
-      return { registeredActions: newActions }
-    })
+      const newActions = new Map(state.registeredActions);
+      newActions.set(hotkeyId, { id: hotkeyId, action });
+      return { registeredActions: newActions };
+    });
 
     // Return unregister function
     return () => {
       set((state) => {
-        const newActions = new Map(state.registeredActions)
-        newActions.delete(hotkeyId)
-        return { registeredActions: newActions }
-      })
-    }
+        const newActions = new Map(state.registeredActions);
+        newActions.delete(hotkeyId);
+        return { registeredActions: newActions };
+      });
+    };
   },
 
   triggerAction: (hotkeyId: string) => {
-    const action = get().registeredActions.get(hotkeyId)
+    const action = get().registeredActions.get(hotkeyId);
     if (action) {
-      void action.action()
+      void action.action();
     } else {
-      console.warn(`[HotkeyStore] No action registered for hotkey: ${hotkeyId}`)
+      console.warn(`[HotkeyStore] No action registered for hotkey: ${hotkeyId}`);
     }
   },
-}))
-
+}));

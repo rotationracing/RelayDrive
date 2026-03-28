@@ -1,8 +1,8 @@
 "use client";
 
-import { getCurrentWindow } from '@tauri-apps/api/window';
-import { useEffect, useState } from 'react';
-import styles from '../styles/titlebar.module.css';
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useEffect, useState } from "react";
+import styles from "../styles/titlebar.module.css";
 
 export default function TitleBar() {
   const [appWindow, setAppWindow] = useState<ReturnType<typeof getCurrentWindow> | null>(null);
@@ -32,7 +32,9 @@ export default function TitleBar() {
 
     return () => {
       mounted = false;
-      try { off?.(); } catch {}
+      try {
+        off?.();
+      } catch {}
     };
   }, []);
 
@@ -45,12 +47,11 @@ export default function TitleBar() {
 
   return (
     <div className={styles.titleBar} data-tauri-drag-region>
+      <div className={styles.dragArea} data-tauri-drag-region onDoubleClick={handleDoubleClick} />
       <div
-        className={styles.dragArea}
-        data-tauri-drag-region
-        onDoubleClick={handleDoubleClick}
-      />
-      <div className={styles.controlsContainer} data-tauri-drag-region={false as unknown as undefined}>
+        className={styles.controlsContainer}
+        data-tauri-drag-region={false as unknown as undefined}
+      >
         <button
           className={styles.controlButton}
           id="titlebar-minimize"
@@ -78,8 +79,8 @@ export default function TitleBar() {
           {isMax ? (
             // Restore icon
             <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true">
-              <path d="M2 3.5h5v4H2z" fill="transparent" stroke="currentColor"/>
-              <path d="M3 2.5h5v4H6" fill="transparent" stroke="currentColor"/>
+              <path d="M2 3.5h5v4H2z" fill="transparent" stroke="currentColor" />
+              <path d="M3 2.5h5v4H6" fill="transparent" stroke="currentColor" />
             </svg>
           ) : (
             // Maximize icon

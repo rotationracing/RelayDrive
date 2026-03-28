@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { initDeepLinkListener } from "@/services/deep-link";
 import { useEffect, useState } from "react";
 
@@ -17,7 +23,10 @@ export default function DeepLinkListener() {
         console.log("[deep-link] received", { source, url, parsed });
 
         // Test hook: open a simple modal on relaydrive(-dev)://callback?test
-        if (parsed.path === "callback" && Object.prototype.hasOwnProperty.call(parsed.query, "test")) {
+        if (
+          parsed.path === "callback" &&
+          Object.prototype.hasOwnProperty.call(parsed.query, "test")
+        ) {
           setLastUrl(url);
           setTestOpen(true);
         }

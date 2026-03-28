@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { Sidebar } from "@/components/sidebar"
-import { useState } from "react"
+import { Sidebar } from "@/components/sidebar";
+import { useState } from "react";
 
-export type Page = "home" | "overlay" | "console" | "profile" | "settings" | "setup"
+export type Page = "home" | "overlay" | "console" | "profile" | "settings" | "setup";
 
 interface MainAppProps {
   onboarding?: boolean;
 }
 
 const MainApp = ({ onboarding }: MainAppProps) => {
-  const [currentPage, setCurrentPage] = useState<Page>("home")
+  const [currentPage, setCurrentPage] = useState<Page>("home");
 
   const renderPage = () => {
     switch (currentPage) {
       case "home":
-        return <div className="p-6">Home</div>
+        return <div className="p-6">Home</div>;
       case "overlay":
-        return <div className="p-6">Overlay</div>
+        return <div className="p-6">Overlay</div>;
       case "console":
-        return <div className="p-6">Console</div>
+        return <div className="p-6">Console</div>;
       default:
-        return <div className="p-6">Home</div>
+        return <div className="p-6">Home</div>;
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-background overflow-hidden">
@@ -32,7 +32,7 @@ const MainApp = ({ onboarding }: MainAppProps) => {
         <div className="h-full overflow-y-auto">{renderPage()}</div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default MainApp
+export default MainApp;

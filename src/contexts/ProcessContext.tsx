@@ -1,29 +1,37 @@
-"use client"
+"use client";
 
-import { isGameProcessRunning, setActiveGame as setActiveGameCommand } from '@/app/tauri-bridge'
-import { listen } from '@tauri-apps/api/event'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { isGameProcessRunning, setActiveGame as setActiveGameCommand } from "@/app/tauri-bridge";
+import { listen } from "@tauri-apps/api/event";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 type ProcessStatusEvent =
   | boolean
   | {
-      gameId?: string
-      game_id?: string
-      running?: boolean
-      status?: boolean
-    }
+      gameId?: string;
+      game_id?: string;
+      running?: boolean;
+      status?: boolean;
+    };
 
 interface ProcessContextType {
-  activeGame: string | null
-  isRunning: boolean
-  isLoading: boolean
-  error: string | null
-  monitorGame: (gameId: string) => Promise<void>
-  stopMonitoring: () => void
-  checkProcess: (gameId?: string) => Promise<void>
+  activeGame: string | null;
+  isRunning: boolean;
+  isLoading: boolean;
+  error: string | null;
+  monitorGame: (gameId: string) => Promise<void>;
+  stopMonitoring: () => void;
+  checkProcess: (gameId?: string) => Promise<void>;
 }
 
-const POLL_INTERVAL_MS = 5000
+const POLL_INTERVAL_MS = 5000;
 
 export const ProcessContext = createContext<ProcessContextType>({
   activeGame: null,
@@ -33,147 +41,147 @@ export const ProcessContext = createContext<ProcessContextType>({
   monitorGame: async () => {},
   stopMonitoring: () => {},
   checkProcess: async () => {},
-})
+});
 
 export function ProcessProvider({ children }: { children: React.ReactNode }) {
-  const [activeGame, setActiveGameState] = useState<string | null>(null)
-  const [isRunning, setIsRunning] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const currentGameRef = useRef<string | null>(null)
+  const [activeGame, setActiveGameState] = useState<string | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const currentGameRef = useRef<string | null>(null);
 
   const clearPoll = useCallback(() => {
     if (pollRef.current) {
-      clearInterval(pollRef.current)
-      pollRef.current = null
+      clearInterval(pollRef.current);
+      pollRef.current = null;
     }
-  }, [])
+  }, []);
 
   const checkProcess = useCallback(async (gameId?: string) => {
-    const target = (gameId ?? currentGameRef.current)?.trim()
+    const target = (gameId ?? currentGameRef.current)?.trim();
     if (!target) {
-      return
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const running = await isGameProcessRunning(target)
-      setIsRunning(running)
-      setError(null)
+      const running = await isGameProcessRunning(target);
+      setIsRunning(running);
+      setError(null);
     } catch (err) {
-      console.error('Failed to check process status:', err)
-      setError('Failed to check process status')
+      console.error("Failed to check process status:", err);
+      setError("Failed to check process status");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const startPoll = useCallback(
     (gameId: string) => {
-      clearPoll()
+      clearPoll();
       pollRef.current = setInterval(() => {
-        void checkProcess(gameId)
-      }, POLL_INTERVAL_MS)
+        void checkProcess(gameId);
+      }, POLL_INTERVAL_MS);
     },
     [checkProcess, clearPoll],
-  )
+  );
 
   const monitorGame = useCallback(
     async (gameId: string) => {
-      const normalized = gameId.trim()
+      const normalized = gameId.trim();
       if (!normalized) {
-        return
+        return;
       }
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
       try {
-        await setActiveGameCommand(normalized)
-        currentGameRef.current = normalized
-        setActiveGameState(normalized)
-        await checkProcess(normalized)
-        startPoll(normalized)
+        await setActiveGameCommand(normalized);
+        currentGameRef.current = normalized;
+        setActiveGameState(normalized);
+        await checkProcess(normalized);
+        startPoll(normalized);
       } catch (err) {
-        console.error('Failed to check process status:', err)
-        setError('Failed to check process status')
-        setIsLoading(false)
+        console.error("Failed to check process status:", err);
+        setError("Failed to check process status");
+        setIsLoading(false);
       }
     },
     [checkProcess, startPoll],
-  )
+  );
 
   const stopMonitoring = useCallback(() => {
-    clearPoll()
-    currentGameRef.current = null
-    setActiveGameState(null)
-    setIsRunning(false)
-    setIsLoading(false)
-    setError(null)
-  }, [clearPoll])
+    clearPoll();
+    currentGameRef.current = null;
+    setActiveGameState(null);
+    setIsRunning(false);
+    setIsLoading(false);
+    setError(null);
+  }, [clearPoll]);
 
   useEffect(() => {
     if (!currentGameRef.current) {
-      return
+      return;
     }
-    let isMounted = true
-    let unlisten: (() => void) | undefined
-    ;(async () => {
+    let isMounted = true;
+    let unlisten: (() => void) | undefined;
+    (async () => {
       try {
-        unlisten = await listen<ProcessStatusEvent>('process_status', (event) => {
+        unlisten = await listen<ProcessStatusEvent>("process_status", (event) => {
           if (!isMounted) {
-            return
+            return;
           }
-          const payload = event.payload
-          const active = currentGameRef.current
+          const payload = event.payload;
+          const active = currentGameRef.current;
           if (!active) {
-            return
+            return;
           }
-          if (typeof payload === 'boolean') {
-            setIsRunning(payload)
-            setIsLoading(false)
-            setError(null)
-            return
+          if (typeof payload === "boolean") {
+            setIsRunning(payload);
+            setIsLoading(false);
+            setError(null);
+            return;
           }
-          if (payload && typeof payload === 'object') {
-            const data = payload as Record<string, unknown>
+          if (payload && typeof payload === "object") {
+            const data = payload as Record<string, unknown>;
             const payloadGame =
-              typeof data.gameId === 'string'
+              typeof data.gameId === "string"
                 ? data.gameId
-                : typeof data.game_id === 'string'
+                : typeof data.game_id === "string"
                   ? data.game_id
-                  : null
+                  : null;
             if (payloadGame && payloadGame.toLowerCase() !== active.toLowerCase()) {
-              return
+              return;
             }
             const runningValue =
-              typeof data.running === 'boolean'
+              typeof data.running === "boolean"
                 ? data.running
-                : typeof data.status === 'boolean'
+                : typeof data.status === "boolean"
                   ? data.status
-                  : undefined
-            if (typeof runningValue === 'boolean') {
-              setIsRunning(runningValue)
-              setIsLoading(false)
-              setError(null)
+                  : undefined;
+            if (typeof runningValue === "boolean") {
+              setIsRunning(runningValue);
+              setIsLoading(false);
+              setError(null);
             }
           }
-        })
+        });
       } catch (err) {
-        console.error('Failed to set up process status listener:', err)
+        console.error("Failed to set up process status listener:", err);
       }
-    })()
+    })();
     return () => {
-      isMounted = false
+      isMounted = false;
       if (unlisten) {
-        unlisten()
+        unlisten();
       }
-    }
-  }, [activeGame])
+    };
+  }, [activeGame]);
 
   useEffect(() => {
     return () => {
-      clearPoll()
-    }
-  }, [clearPoll])
+      clearPoll();
+    };
+  }, [clearPoll]);
 
   const value = useMemo(
     () => ({
@@ -186,15 +194,15 @@ export function ProcessProvider({ children }: { children: React.ReactNode }) {
       checkProcess,
     }),
     [activeGame, isRunning, isLoading, error, monitorGame, stopMonitoring, checkProcess],
-  )
+  );
 
-  return <ProcessContext.Provider value={value}>{children}</ProcessContext.Provider>
+  return <ProcessContext.Provider value={value}>{children}</ProcessContext.Provider>;
 }
 
 export const useProcess = () => {
-  const context = useContext(ProcessContext)
+  const context = useContext(ProcessContext);
   if (context === undefined) {
-    throw new Error('useProcess must be used within a ProcessProvider')
+    throw new Error("useProcess must be used within a ProcessProvider");
   }
-  return context
-}
+  return context;
+};

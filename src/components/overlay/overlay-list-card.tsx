@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { HotkeyDisplay } from "@/components/ui/hotkey-display"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
-import { Move, PenSquare, Search } from "lucide-react"
-import type { OverlayInstance } from "@/app/acc/overlay/types"
-import { OverlayCardItem } from "./overlay-card-item"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { HotkeyDisplay } from "@/components/ui/hotkey-display";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import { Move, PenSquare, Search } from "lucide-react";
+import type { OverlayInstance } from "@/app/acc/overlay/types";
+import { OverlayCardItem } from "./overlay-card-item";
 
 interface OverlayListCardProps {
-  overlays: OverlayInstance[]
-  query: string
-  onQueryChange: (query: string) => void
-  editMode: boolean
-  onToggleEditMode: () => void
-  editModeHotkey?: string
-  onToggleOverlay: (id: string) => void
-  onOpenSettings: (id: string) => void
-  onDragStart: (id: string) => void
-  onDrop: (targetId: string) => void
+  overlays: OverlayInstance[];
+  query: string;
+  onQueryChange: (query: string) => void;
+  editMode: boolean;
+  onToggleEditMode: () => void;
+  editModeHotkey?: string;
+  onToggleOverlay: (id: string) => void;
+  onOpenSettings: (id: string) => void;
+  onDragStart: (id: string) => void;
+  onDrop: (targetId: string) => void;
 }
 
 export function OverlayListCard({
@@ -36,12 +36,12 @@ export function OverlayListCard({
   onDrop,
 }: OverlayListCardProps) {
   const filtered = overlays.filter((overlay) => {
-    const q = query.trim().toLowerCase()
-    if (!q) return true
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
     return [overlay.title, overlay.description]
       .filter(Boolean)
-      .some((text) => (text as string).toLowerCase().includes(q))
-  })
+      .some((text) => (text as string).toLowerCase().includes(q));
+  });
 
   return (
     <Card className="rounded-[var(--radius-xl)]">
@@ -117,6 +117,5 @@ export function OverlayListCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-

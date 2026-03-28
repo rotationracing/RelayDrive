@@ -8,5 +8,5 @@ export function OverlayPageHeader() {
         </p>
       </div>
     </header>
-  )
+  );
 }

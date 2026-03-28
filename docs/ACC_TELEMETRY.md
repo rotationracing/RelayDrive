@@ -16,16 +16,12 @@ RelayDrive provides four complementary data streams from Assetto Corsa Competizi
 ### Quick Start
 
 ```tsx
-import { useAccPhysics } from "@/contexts/AccPhysicsContext"
+import { useAccPhysics } from "@/contexts/AccPhysicsContext";
 
 export function SpeedGauge() {
-  const { frame } = useAccPhysics()
-  
-  return (
-    <div>
-      Speed: {frame?.data?.speed_kmh?.toFixed(1)} km/h
-    </div>
-  )
+  const { frame } = useAccPhysics();
+
+  return <div>Speed: {frame?.data?.speed_kmh?.toFixed(1)} km/h</div>;
 }
 ```
 
@@ -35,16 +31,16 @@ Returns the current physics frame and status:
 
 ```tsx
 interface PhysicsContextValue {
-  frame: PhysicsFrame | null          // Current frame (updated at 60 FPS)
-  lastOkFrame: PhysicsFrame | null    // Last successful frame (fallback)
-  status: PhysicsStatus               // "ok" | "waiting" | "error"
+  frame: PhysicsFrame | null; // Current frame (updated at 60 FPS)
+  lastOkFrame: PhysicsFrame | null; // Last successful frame (fallback)
+  status: PhysicsStatus; // "ok" | "waiting" | "error"
 }
 
 interface PhysicsFrame {
-  timestamp: number                   // Unix milliseconds
-  status: PhysicsStatus
-  data: PhysicsMap | null             // Full physics object
-  message: string | null              // Error/status message
+  timestamp: number; // Unix milliseconds
+  status: PhysicsStatus;
+  data: PhysicsMap | null; // Full physics object
+  message: string | null; // Error/status message
 }
 ```
 
@@ -91,12 +87,14 @@ For complete field list, see the [PhysicsMap documentation](./PHYSICS_MAP.md).
 ### Performance Considerations
 
 ✅ **Optimized for multiple consumers:**
+
 - Physics data is serialized once per 60 FPS frame
 - Shared via `Arc<Value>` (cheap pointer copies, not clones)
 - 10+ components can access without performance loss
 - Uses `requestAnimationFrame` to throttle React updates to screen refresh
 
 ⚠️ **Best practices:**
+
 - Access `frame.data` directly for single fields
 - Avoid destructuring entire frame in render (creates new object refs)
 - Use `lastOkFrame` as fallback when `frame` is null
@@ -104,17 +102,17 @@ For complete field list, see the [PhysicsMap documentation](./PHYSICS_MAP.md).
 ### Example: Multi-Field Component
 
 ```tsx
-import { useAccPhysics } from "@/contexts/AccPhysicsContext"
+import { useAccPhysics } from "@/contexts/AccPhysicsContext";
 
 export function TelemetryDisplay() {
-  const { frame, status } = useAccPhysics()
-  
-  if (status === "waiting") return <div>Awaiting ACC...</div>
-  if (status === "error") return <div>Connection lost</div>
-  if (!frame?.data) return null
-  
-  const { speed_kmh, rpm, gear, fuel } = frame.data
-  
+  const { frame, status } = useAccPhysics();
+
+  if (status === "waiting") return <div>Awaiting ACC...</div>;
+  if (status === "error") return <div>Connection lost</div>;
+  if (!frame?.data) return null;
+
+  const { speed_kmh, rpm, gear, fuel } = frame.data;
+
   return (
     <div>
       <div>Speed: {speed_kmh?.toFixed(1)} km/h</div>
@@ -122,25 +120,25 @@ export function TelemetryDisplay() {
       <div>Gear: {gear}</div>
       <div>Fuel: {fuel?.toFixed(1)}L</div>
     </div>
-  )
+  );
 }
 ```
 
 ### Status Handling
 
 ```tsx
-const { frame, status } = useAccPhysics()
+const { frame, status } = useAccPhysics();
 
 switch (status) {
   case "ok":
     // ACC is running and sending data
-    break
+    break;
   case "waiting":
     // ACC not running or shared memory not available
-    break
+    break;
   case "error":
     // Connection error occurred
-    break
+    break;
 }
 ```
 
@@ -151,17 +149,17 @@ switch (status) {
 ### Quick Start
 
 ```tsx
-import { useAccGraphics } from "@/contexts/AccGraphicsContext"
+import { useAccGraphics } from "@/contexts/AccGraphicsContext";
 
 export function LapTimer() {
-  const { frame } = useAccGraphics()
-  
+  const { frame } = useAccGraphics();
+
   return (
     <div>
       Current: {frame?.data?.current_time_str}
       Best: {frame?.data?.best_time_str}
     </div>
-  )
+  );
 }
 ```
 
@@ -171,16 +169,16 @@ Returns the current graphics frame and status:
 
 ```tsx
 interface GraphicsContextValue {
-  frame: GraphicsFrame | null          // Current frame (updated at 60 Hz)
-  lastOkFrame: GraphicsFrame | null    // Last successful frame (fallback)
-  status: GraphicsStatus               // "ok" | "waiting" | "error"
+  frame: GraphicsFrame | null; // Current frame (updated at 60 Hz)
+  lastOkFrame: GraphicsFrame | null; // Last successful frame (fallback)
+  status: GraphicsStatus; // "ok" | "waiting" | "error"
 }
 
 interface GraphicsFrame {
-  timestamp: number                   // Unix milliseconds
-  status: GraphicsStatus
-  data: GraphicsMap | null             // Full graphics object
-  message: string | null              // Error/status message
+  timestamp: number; // Unix milliseconds
+  status: GraphicsStatus;
+  data: GraphicsMap | null; // Full graphics object
+  message: string | null; // Error/status message
 }
 ```
 
@@ -190,37 +188,37 @@ The `frame.data` object contains all ACC graphics fields including:
 
 ```tsx
 // Lap Timing
-current_time_str: string           // Current lap time string
-best_time_str: string             // Best lap time string
-last_time_str: string             // Last lap time string
-current_time: number              // Current lap time (ms)
-delta_lap_time_str: string        // Delta lap time string
+current_time_str: string; // Current lap time string
+best_time_str: string; // Best lap time string
+last_time_str: string; // Last lap time string
+current_time: number; // Current lap time (ms)
+delta_lap_time_str: string; // Delta lap time string
 
 // Session & Positioning
-position: number                  // Current car position
-completed_lap: number             // Number of completed laps
-is_in_pit: boolean                // Car is in pit area
-is_in_pit_lane: boolean           // Car is in pit lane
+position: number; // Current car position
+completed_lap: number; // Number of completed laps
+is_in_pit: boolean; // Car is in pit area
+is_in_pit_lane: boolean; // Car is in pit lane
 
 // Flags
-global_yellow: boolean            // Yellow flag active
-global_red: boolean               // Red flag active
-global_chequered: boolean         // Chequered flag active
+global_yellow: boolean; // Yellow flag active
+global_red: boolean; // Red flag active
+global_chequered: boolean; // Chequered flag active
 
 // Environment
-rain_intensity: number            // Current rain intensity
-wind_speed: number                // Wind speed (m/s)
-wind_direction: number            // Wind direction (degrees)
+rain_intensity: number; // Current rain intensity
+wind_speed: number; // Wind speed (m/s)
+wind_direction: number; // Wind direction (degrees)
 
 // Driver Controls
-tc_level: number                  // Traction control level
-abs_level: number                 // ABS level
-engine_map: number                // Engine map setting
+tc_level: number; // Traction control level
+abs_level: number; // ABS level
+engine_map: number; // Engine map setting
 
 // Penalties & Pit
-penalty_time: number              // Current penalty time (s)
-mandatory_pit_done: boolean       // Mandatory pit complete
-missing_mandatory_pits: number    // Mandatory pits remaining
+penalty_time: number; // Current penalty time (s)
+mandatory_pit_done: boolean; // Mandatory pit complete
+missing_mandatory_pits: number; // Mandatory pits remaining
 ```
 
 For complete field list, see the [GraphicsMap documentation](./GRAPHICS_MAP.md).
@@ -228,11 +226,13 @@ For complete field list, see the [GraphicsMap documentation](./GRAPHICS_MAP.md).
 ### Performance Considerations
 
 ✅ **Optimized for multiple consumers:**
+
 - Graphics data is serialized once per 60 Hz frame
 - Shared via `Arc<Value>` (cheap pointer copies, not clones)
 - Uses `requestAnimationFrame` to throttle React updates to screen refresh
 
 ⚠️ **Best practices:**
+
 - Access `frame.data` directly for single fields
 - Avoid destructuring entire frame in render (creates new object refs)
 - Use `lastOkFrame` as fallback when `frame` is null
@@ -250,21 +250,21 @@ The broadcast data stream connects to ACC's Broadcasting API, providing real-tim
 ### Quick Start
 
 ```tsx
-import { useAccBroadcast } from "@/contexts/AccBroadcastContext"
+import { useAccBroadcast } from "@/contexts/AccBroadcastContext";
 
 export function LiveStandings() {
-  const { frame } = useAccBroadcast()
-  
-  const realtimeUpdate = frame?.data?.RealtimeUpdate
-  const carUpdate = frame?.data?.RealtimeCarUpdate
-  
+  const { frame } = useAccBroadcast();
+
+  const realtimeUpdate = frame?.data?.RealtimeUpdate;
+  const carUpdate = frame?.data?.RealtimeCarUpdate;
+
   return (
     <div>
       <div>Session: {realtimeUpdate?.session_type}</div>
       <div>Position: {carUpdate?.position}</div>
       <div>Lap: {carUpdate?.lap_count}</div>
     </div>
-  )
+  );
 }
 ```
 
@@ -274,16 +274,16 @@ Returns the current broadcast frame and status:
 
 ```tsx
 interface BroadcastContextValue {
-  frame: BroadcastFrame | null          // Current frame (updated at 10 Hz)
-  lastOkFrame: BroadcastFrame | null    // Last successful frame (fallback)
-  status: BroadcastStatus               // "ok" | "waiting" | "error"
+  frame: BroadcastFrame | null; // Current frame (updated at 10 Hz)
+  lastOkFrame: BroadcastFrame | null; // Last successful frame (fallback)
+  status: BroadcastStatus; // "ok" | "waiting" | "error"
 }
 
 interface BroadcastFrame {
-  timestamp: number                     // Unix milliseconds
-  status: BroadcastStatus
-  data: BroadcastMap | null             // Full broadcast message
-  message: string | null                // Error/status message
+  timestamp: number; // Unix milliseconds
+  status: BroadcastStatus;
+  data: BroadcastMap | null; // Full broadcast message
+  message: string | null; // Error/status message
 }
 ```
 
@@ -369,12 +369,14 @@ For complete field list and detailed usage examples, see the [BroadcastMap docum
 ### Performance Considerations
 
 ✅ **Optimized for broadcast data:**
+
 - Broadcast data updates at 10 Hz (every 100ms)
 - Much lower frequency than physics (60 FPS) and graphics (60 Hz)
 - Ideal for spectator features, standings, and session information
 - Uses `requestAnimationFrame` to throttle React updates
 
 ⚠️ **Best practices:**
+
 - Each message type is independent - check which message is present
 - Not suitable for real-time driver telemetry (use physics/graphics for that)
 - Connection requires ACC to be running as a server with broadcasting enabled
@@ -383,46 +385,48 @@ For complete field list and detailed usage examples, see the [BroadcastMap docum
 ### Example: Session Weather
 
 ```tsx
-import { useAccBroadcast } from "@/contexts/AccBroadcastContext"
+import { useAccBroadcast } from "@/contexts/AccBroadcastContext";
 
 export function WeatherDisplay() {
-  const { frame } = useAccBroadcast()
-  
-  const update = frame?.data?.RealtimeUpdate
-  if (!update) return null
-  
+  const { frame } = useAccBroadcast();
+
+  const update = frame?.data?.RealtimeUpdate;
+  if (!update) return null;
+
   return (
     <div>
       <div>Track Temp: {update.track_temp}°C</div>
       <div>Rain: {(update.rain_level * 100).toFixed(0)}%</div>
       <div>Wetness: {(update.wetness * 100).toFixed(0)}%</div>
     </div>
-  )
+  );
 }
 ```
 
 ### Example: Live Positions
 
 ```tsx
-import { useAccBroadcast } from "@/contexts/AccBroadcastContext"
+import { useAccBroadcast } from "@/contexts/AccBroadcastContext";
 
 export function PositionDisplay() {
-  const { frame } = useAccBroadcast()
-  
-  const carUpdate = frame?.data?.RealtimeCarUpdate
-  const entryList = frame?.data?.EntryList
-  
-  if (!carUpdate || !entryList) return null
-  
-  const entry = entryList.entries.find(e => e.car_index === carUpdate.car_index)
-  
+  const { frame } = useAccBroadcast();
+
+  const carUpdate = frame?.data?.RealtimeCarUpdate;
+  const entryList = frame?.data?.EntryList;
+
+  if (!carUpdate || !entryList) return null;
+
+  const entry = entryList.entries.find((e) => e.car_index === carUpdate.car_index);
+
   return (
     <div>
-      <div>P{carUpdate.position} - #{entry?.race_number}</div>
+      <div>
+        P{carUpdate.position} - #{entry?.race_number}
+      </div>
       <div>{entry?.team_name}</div>
       <div>Lap {carUpdate.lap_count}</div>
     </div>
-  )
+  );
 }
 ```
 
@@ -441,21 +445,21 @@ For the broadcast stream to work, ACC must be configured as a server:
 ### Quick Start
 
 ```tsx
-import { invoke } from "@tauri-apps/api/core"
+import { invoke } from "@tauri-apps/api/core";
 
 export function SessionInfo() {
-  const [statics, setStatics] = useState(null)
-  
+  const [statics, setStatics] = useState(null);
+
   useEffect(() => {
-    invoke("get_acc_statics").then(setStatics)
-  }, [])
-  
+    invoke("get_acc_statics").then(setStatics);
+  }, []);
+
   return (
     <div>
       Track: {statics?.track}
       Car: {statics?.carModel}
     </div>
-  )
+  );
 }
 ```
 
@@ -466,22 +470,22 @@ interface AccStaticsPayload {
   // Session Info
   track: string                  // Track name
   carModel: string               // Car model name
-  
+
   // Driver Info
   playerName: string             // Driver first name
   playerSurname: string          // Driver last name
   playerNick: string             // Driver nickname
-  
+
   // Session Settings
   numberOf Sessions: number      // Total sessions in event
   numCars: number                // Number of cars in session
   sectorCount: number            // Number of track sectors
   isOnline: boolean              // Online session flag
-  
+
   // Car Limits
   maxRpm: number                 // Maximum engine RPM
   maxFuel: number                // Maximum fuel capacity (liters)
-  
+
   // Assists & Penalties
   penaltyEnabled: boolean
   aidFuelRate: number            // Fuel consumption aid
@@ -489,15 +493,15 @@ interface AccStaticsPayload {
   aidMechanicalDamage: number    // Mechanical damage aid
   aidStability: number           // Stability control aid
   aidAutoClutch: boolean         // Auto-clutch enabled
-  
+
   // Pit Window
   pitWindowStart: number         // Pit window start lap
   pitWindowEnd: number           // Pit window end lap
-  
+
   // Tyre Info
   dryTyresName: string           // Dry tyre compound name
   wetTyresName: string           // Wet tyre compound name
-  
+
   // Version Info
   smVersion: string              // Shared memory version
   acVersion: string              // ACC version
@@ -507,24 +511,24 @@ interface AccStaticsPayload {
 ### Caching Pattern
 
 ```tsx
-import { useCallback, useRef, useEffect } from "react"
-import { invoke } from "@tauri-apps/api/core"
+import { useCallback, useRef, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 export function useAccStatics() {
-  const [statics, setStatics] = useState(null)
-  const fetchedRef = useRef(false)
-  
+  const [statics, setStatics] = useState(null);
+  const fetchedRef = useRef(false);
+
   const fetchStatics = useCallback(async () => {
     try {
-      const res = await invoke("get_acc_statics")
-      setStatics(res)
-      fetchedRef.current = true
+      const res = await invoke("get_acc_statics");
+      setStatics(res);
+      fetchedRef.current = true;
     } catch (e) {
-      console.error("Failed to fetch statics", e)
+      console.error("Failed to fetch statics", e);
     }
-  }, [])
-  
-  return { statics, fetchStatics, isFetched: fetchedRef.current }
+  }, []);
+
+  return { statics, fetchStatics, isFetched: fetchedRef.current };
 }
 ```
 
@@ -533,29 +537,31 @@ export function useAccStatics() {
 ## Combined Usage: Physics + Statics
 
 ```tsx
-import { useAccPhysics } from "@/contexts/AccPhysicsContext"
-import { invoke } from "@tauri-apps/api/core"
-import { useEffect, useState } from "react"
+import { useAccPhysics } from "@/contexts/AccPhysicsContext";
+import { invoke } from "@tauri-apps/api/core";
+import { useEffect, useState } from "react";
 
 export function RaceEngineer() {
-  const { frame } = useAccPhysics()
-  const [statics, setStatics] = useState(null)
-  
+  const { frame } = useAccPhysics();
+  const [statics, setStatics] = useState(null);
+
   useEffect(() => {
-    invoke("get_acc_statics").then(setStatics)
-  }, [])
-  
-  if (!frame?.data || !statics) return <div>Loading...</div>
-  
-  const lapTime = calculateLapTime(frame.data, statics)
-  
+    invoke("get_acc_statics").then(setStatics);
+  }, []);
+
+  if (!frame?.data || !statics) return <div>Loading...</div>;
+
+  const lapTime = calculateLapTime(frame.data, statics);
+
   return (
     <div>
-      <h2>{statics.carModel} at {statics.track}</h2>
+      <h2>
+        {statics.carModel} at {statics.track}
+      </h2>
       <p>Speed: {frame.data.speed_kmh?.toFixed(1)} km/h</p>
       <p>Estimated Lap: {lapTime}</p>
     </div>
-  )
+  );
 }
 ```
 

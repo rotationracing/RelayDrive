@@ -1,29 +1,35 @@
-"use client"
+"use client";
 
-import { Button, buttonVariants } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { HotkeyDisplay } from "@/components/ui/hotkey-display"
-import { cn } from "@/lib/utils"
-import { Download, Power, Upload, Move, PenSquare, RotateCcw, Trash2 } from "lucide-react"
-import { useRef } from "react"
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { HotkeyDisplay } from "@/components/ui/hotkey-display";
+import { cn } from "@/lib/utils";
+import { Download, Power, Upload, Move, PenSquare, RotateCcw, Trash2 } from "lucide-react";
+import { useRef } from "react";
 
 interface OverlayPresetsCardProps {
-  overlaysEnabled: boolean
-  onToggleOverlaysEnabled: () => Promise<void>
-  selectedPreset: string
-  availableConfigs: string[]
-  onSelectPreset: (preset: string) => void
-  onCreatePreset: () => void
-  onResetDefault: () => Promise<void>
-  onDeletePreset: () => Promise<void>
-  onExportConfig: () => Promise<void>
-  onImportConfig: (file: File) => Promise<void>
-  overlaysEnabledHotkey?: string
-  editMode: boolean
-  onToggleEditMode: () => void
-  editModeHotkey?: string
-  highlightPower?: boolean
+  overlaysEnabled: boolean;
+  onToggleOverlaysEnabled: () => Promise<void>;
+  selectedPreset: string;
+  availableConfigs: string[];
+  onSelectPreset: (preset: string) => void;
+  onCreatePreset: () => void;
+  onResetDefault: () => Promise<void>;
+  onDeletePreset: () => Promise<void>;
+  onExportConfig: () => Promise<void>;
+  onImportConfig: (file: File) => Promise<void>;
+  overlaysEnabledHotkey?: string;
+  editMode: boolean;
+  onToggleEditMode: () => void;
+  editModeHotkey?: string;
+  highlightPower?: boolean;
 }
 
 export function OverlayPresetsCard({
@@ -43,7 +49,7 @@ export function OverlayPresetsCard({
   editModeHotkey,
   highlightPower,
 }: OverlayPresetsCardProps) {
-  const importInputRef = useRef<HTMLInputElement>(null)
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex gap-4 items-center justify-between w-full">
@@ -52,10 +58,10 @@ export function OverlayPresetsCard({
           value={selectedPreset}
           onValueChange={(value) => {
             if (value === "__create__") {
-              onCreatePreset()
-              return
+              onCreatePreset();
+              return;
             }
-            if (value) onSelectPreset(value)
+            if (value) onSelectPreset(value);
           }}
         >
           <SelectTrigger
@@ -120,11 +126,11 @@ export function OverlayPresetsCard({
             accept="application/json"
             className="hidden"
             onChange={(event) => {
-              const file = event.target.files?.[0]
+              const file = event.target.files?.[0];
               if (file) {
-                void onImportConfig(file)
+                void onImportConfig(file);
               }
-              if (importInputRef.current) importInputRef.current.value = ""
+              if (importInputRef.current) importInputRef.current.value = "";
             }}
           />
 
@@ -141,7 +147,7 @@ export function OverlayPresetsCard({
             </TooltipTrigger>
             <TooltipContent>Import preset</TooltipContent>
           </Tooltip>
-          
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -149,7 +155,7 @@ export function OverlayPresetsCard({
                 variant="outline"
                 className="h-9 w-9 rounded-[var(--radius-md)] bg-card"
                 onClick={() => {
-                  void onExportConfig()
+                  void onExportConfig();
                 }}
               >
                 <Download className="h-4 w-4" />
@@ -172,7 +178,7 @@ export function OverlayPresetsCard({
                   "flex h-9 w-9 p-0 items-center justify-center rounded-[var(--radius-md)] transition-colors bg-card",
                   editMode
                     ? "bg-red-accent text-white hover:bg-red-accent/90 border-transparent"
-                    : "border border-border/60 text-foreground hover:bg-muted/40"
+                    : "border border-border/60 text-foreground hover:bg-muted/40",
                 )}
               >
                 <Move className="h-4 w-4" />
@@ -197,7 +203,8 @@ export function OverlayPresetsCard({
                   overlaysEnabled
                     ? "bg-red-accent text-white hover:bg-red-accent/90 border-transparent"
                     : "border border-border/60 text-foreground hover:bg-muted/40",
-                  highlightPower && "border-red-accent bg-red-accent/10 text-red-accent shadow-[0_0_12px_rgba(220,38,38,0.4)]"
+                  highlightPower &&
+                    "border-red-accent bg-red-accent/10 text-red-accent shadow-[0_0_12px_rgba(220,38,38,0.4)]",
                 )}
               >
                 <Power className="h-4 w-4" />
@@ -211,5 +218,5 @@ export function OverlayPresetsCard({
         </TooltipProvider>
       </div>
     </div>
-  )
+  );
 }

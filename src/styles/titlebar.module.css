@@ -1,71 +1,70 @@
 .titleBar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 32px;
-    z-index: 1000;
-    display: flex;
-    -webkit-app-region: drag;
-    background-color: transparent;
-    transition: background-color 0.2s ease;
-  }
-  
-  .titleBar:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
-  
-  .dragArea {
-    flex: 1;
-    height: 100%;
-    -webkit-app-region: drag;
-  }
-  
-  .controlsContainer {
-    display: flex;
-    height: 100%;
-    -webkit-app-region: no-drag;
-    background: transparent;
-  }
-  
-  .controlButton {
-    width: 46px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding: 0;
-    margin: 0;
-    -webkit-app-region: no-drag;
-  }
-  
-  .controlButton:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-  }
-  
-  .controlButton svg {
-    width: 10px;
-    height: 10px;
-    transition: all 0.2s ease;
-  }
-  
-  .closeButton:hover {
-    background: #e81123 !important;
-    color: white !important;
-  }
-  
-  /* Adjust for when window is not focused */
-  :global(.window-inactive) .controlButton {
-    color: rgba(255, 255, 255, 0.4);
-  }
-  
-  :global(.window-inactive) .titleBar:hover {
-    background-color: transparent;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  z-index: 1000;
+  display: flex;
+  -webkit-app-region: drag;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.titleBar:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dragArea {
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+}
+
+.controlsContainer {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+  background: transparent;
+}
+
+.controlButton {
+  width: 46px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+  margin: 0;
+  -webkit-app-region: no-drag;
+}
+
+.controlButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.controlButton svg {
+  width: 10px;
+  height: 10px;
+  transition: all 0.2s ease;
+}
+
+.closeButton:hover {
+  background: #e81123 !important;
+  color: white !important;
+}
+
+/* Adjust for when window is not focused */
+:global(.window-inactive) .controlButton {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+:global(.window-inactive) .titleBar:hover {
+  background-color: transparent;
+}

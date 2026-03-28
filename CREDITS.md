@@ -1,12 +1,14 @@
 # Credits
 
 ## Core Frameworks
+
 - [Next.js](https://nextjs.org)
 - [React](https://react.dev)
 - [Tauri](https://tauri.app)
 - [Rust](https://www.rust-lang.org)
 
 ## UI Components
+
 - [Radix UI](https://www.radix-ui.com)
 - [Tailwind CSS](https://tailwindcss.com)
 - [Lucide React](https://lucide.dev)
@@ -14,6 +16,7 @@
 - [Geist Font](https://vercel.com/font)
 
 ## Libraries
+
 - [Zustand](https://zustand-demo.pmnd.rs)
 - [TanStack Query](https://tanstack.com/query)
 - [Recharts](https://recharts.org)
@@ -25,6 +28,7 @@
 - [color](https://github.com/Qix-/color)
 
 ## Tauri Plugins
+
 - [@tauri-apps/plugin-deep-link](https://v2.tauri.app/plugin/deep-link/)
 - [@tauri-apps/plugin-global-shortcut](https://v2.tauri.app/plugin/global-shortcut/)
 - [@tauri-apps/plugin-shell](https://v2.tauri.app/plugin/shell/)
@@ -33,6 +37,7 @@
 - [@tauri-apps/plugin-log](https://v2.tauri.app/plugin/log/)
 
 ## Rust Crates
+
 - [serde](https://serde.rs)
 - [serde_json](https://github.com/serde-rs/json)
 - [log](https://docs.rs/log)
@@ -41,11 +46,12 @@
 - [sysinfo](https://docs.rs/sysinfo)
 
 ## Game Integration
+
 - [acc_shared_memory_rs](https://github.com/nkr4m/acc_shared_memory_rs) by [Naresh Kumar](https://github.com/nkr4m)
 - [acbc](https://github.com/bradfier/acbc) - ACC Broadcasting API protocol decoder by [Richard Bradfield](https://github.com/bradfier)
 
-
 ## Development Tools
+
 - [TypeScript](https://www.typescriptlang.org)
 - [Biome](https://biomejs.dev)
 - [ESLint](https://eslint.org)

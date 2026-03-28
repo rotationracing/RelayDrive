@@ -1,30 +1,46 @@
-"use client"
+"use client";
 
-import type { ConnectionDetails, GameConnectionSettings } from "@/app/tauri-bridge"
-import { MeasurementUnitsModal } from "@/components/settings/MeasurementUnitsModal"
-import { Button } from "@/components/ui/button"
+import type { ConnectionDetails, GameConnectionSettings } from "@/app/tauri-bridge";
+import { MeasurementUnitsModal } from "@/components/settings/MeasurementUnitsModal";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { HotkeyInput, type HotkeyValue, formatHotkey, parseHotkey } from "@/components/ui/hotkey-input"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { useSettingsContext } from "@/contexts/SettingsContext"
-import { setLocale, useI18n } from "@/i18n"
-import type { LanguageCode } from "@/lib/language"
-import { LANGUAGE_OPTIONS } from "@/lib/language"
-import { CHOICE_IMPERIAL, CHOICE_METRIC, type UnitsMode, inferUnitsModeFromChoice } from "@/lib/units"
-import type React from "react"
-import { useEffect, useState } from "react"
+} from "@/components/ui/dialog";
+import {
+  HotkeyInput,
+  type HotkeyValue,
+  formatHotkey,
+  parseHotkey,
+} from "@/components/ui/hotkey-input";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { setLocale, useI18n } from "@/i18n";
+import type { LanguageCode } from "@/lib/language";
+import { LANGUAGE_OPTIONS } from "@/lib/language";
+import {
+  CHOICE_IMPERIAL,
+  CHOICE_METRIC,
+  type UnitsMode,
+  inferUnitsModeFromChoice,
+} from "@/lib/units";
+import type React from "react";
+import { useEffect, useState } from "react";
 
-type GameConnectionKey = keyof GameConnectionSettings
+type GameConnectionKey = keyof GameConnectionSettings;
 
-const CONNECTION_GAME_KEYS: GameConnectionKey[] = ["acc", "iracing", "lmu"]
+const CONNECTION_GAME_KEYS: GameConnectionKey[] = ["acc", "iracing", "lmu"];
 
 const DEFAULT_CONNECTION_SETTINGS: GameConnectionSettings = {
   acc: {
@@ -45,33 +61,33 @@ const DEFAULT_CONNECTION_SETTINGS: GameConnectionSettings = {
     connectionPassword: "",
     commandPassword: "",
   },
-}
+};
 
 type EditableSettings = {
-  checkForUpdates: boolean
-  language: string
-  measurement_units: typeof CHOICE_METRIC
-  hotkeys: Record<string, string | null>
-  connectionSettings: GameConnectionSettings
-  setupPaths: { acc: string | null; iracing: string | null; lmu: string | null }
-}
+  checkForUpdates: boolean;
+  language: string;
+  measurement_units: typeof CHOICE_METRIC;
+  hotkeys: Record<string, string | null>;
+  connectionSettings: GameConnectionSettings;
+  setupPaths: { acc: string | null; iracing: string | null; lmu: string | null };
+};
 
 const GAME_OPTIONS = [
   { value: "acc", label: "ACC" },
   { value: "iracing", label: "iRacing" },
   { value: "lmu", label: "LMU" },
-] as const satisfies readonly { value: GameConnectionKey; label: string }[]
+] as const satisfies readonly { value: GameConnectionKey; label: string }[];
 
 export function SettingsPage() {
-  const { t } = useI18n()
-  const { settings: globalSettings, persist } = useSettingsContext()
-  const [settings, setSettings] = useState<EditableSettings | null>(null)
-  const [unitsMode, setUnitsMode] = useState<UnitsMode>("metric")
-  const [unitsModalOpen, setUnitsModalOpen] = useState(false)
-  const [activeConnectionGame, setActiveConnectionGame] = useState<GameConnectionKey | null>(null)
+  const { t } = useI18n();
+  const { settings: globalSettings, persist } = useSettingsContext();
+  const [settings, setSettings] = useState<EditableSettings | null>(null);
+  const [unitsMode, setUnitsMode] = useState<UnitsMode>("metric");
+  const [unitsModalOpen, setUnitsModalOpen] = useState(false);
+  const [activeConnectionGame, setActiveConnectionGame] = useState<GameConnectionKey | null>(null);
 
   useEffect(() => {
-    if (!globalSettings) return
+    if (!globalSettings) return;
 
     const loaded = {
       checkForUpdates: globalSettings.checkForUpdates ?? true,
@@ -84,177 +100,174 @@ export function SettingsPage() {
       },
       connectionSettings: globalSettings.connectionSettings ?? DEFAULT_CONNECTION_SETTINGS,
       setupPaths: globalSettings.setupPaths ?? { acc: null, iracing: null, lmu: null },
-    }
+    };
 
-    setSettings(loaded)
-    setUnitsMode(inferUnitsModeFromChoice(loaded.measurement_units))
-  }, [globalSettings])
+    setSettings(loaded);
+    setUnitsMode(inferUnitsModeFromChoice(loaded.measurement_units));
+  }, [globalSettings]);
 
   const handleLanguageChange = async (value: string) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    setSettings({ ...settings, language: value })
-    await setLocale(value as LanguageCode)
+    setSettings({ ...settings, language: value });
+    await setLocale(value as LanguageCode);
 
     try {
       await persist({
         ...globalSettings,
         language: value,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save language setting:", error)
+      console.error("Failed to save language setting:", error);
     }
-  }
+  };
 
   const handleUnitsModeChange = async (mode: UnitsMode) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    let newChoice: typeof CHOICE_METRIC
+    let newChoice: typeof CHOICE_METRIC;
     if (mode === "custom") {
-      setUnitsModalOpen(true)
-      return
+      setUnitsModalOpen(true);
+      return;
     }
 
     if (mode === "imperial") {
-      newChoice = CHOICE_IMPERIAL
+      newChoice = CHOICE_IMPERIAL;
     } else {
-      newChoice = CHOICE_METRIC
+      newChoice = CHOICE_METRIC;
     }
 
-    setSettings({ ...settings, measurement_units: newChoice })
-    setUnitsMode(mode)
+    setSettings({ ...settings, measurement_units: newChoice });
+    setUnitsMode(mode);
 
     try {
       await persist({
         ...globalSettings,
         measurement_units: newChoice,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save units setting:", error)
+      console.error("Failed to save units setting:", error);
     }
-  }
+  };
 
   const handleCustomUnitsSave = async (choice: typeof CHOICE_METRIC) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    setSettings({ ...settings, measurement_units: choice })
-    setUnitsMode("custom")
+    setSettings({ ...settings, measurement_units: choice });
+    setUnitsMode("custom");
 
     try {
       await persist({
         ...globalSettings,
         measurement_units: choice,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save custom units setting:", error)
+      console.error("Failed to save custom units setting:", error);
     }
-  }
+  };
 
   const handleCheckForUpdatesChange = async (checked: boolean) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    setSettings({ ...settings, checkForUpdates: checked })
+    setSettings({ ...settings, checkForUpdates: checked });
 
     try {
       await persist({
         ...globalSettings,
         checkForUpdates: checked,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save check for updates setting:", error)
+      console.error("Failed to save check for updates setting:", error);
     }
-  }
+  };
 
   const handleHotkeyChange = async (hotkeyId: string, value: HotkeyValue | null) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    const hotkeyString = value ? formatHotkey(value) : null
+    const hotkeyString = value ? formatHotkey(value) : null;
     const updatedHotkeys = {
       ...settings.hotkeys,
       [hotkeyId]: hotkeyString,
-    }
+    };
 
     setSettings({
       ...settings,
       hotkeys: updatedHotkeys,
-    })
+    });
 
     try {
       await persist({
         ...globalSettings,
         hotkeys: updatedHotkeys,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save hotkey setting:", error)
+      console.error("Failed to save hotkey setting:", error);
     }
-  }
+  };
 
-  const handleSetupPathChange = async (
-    game: "acc" | "iracing" | "lmu",
-    value: string
-  ) => {
-    if (!settings || !globalSettings) return
+  const handleSetupPathChange = async (game: "acc" | "iracing" | "lmu", value: string) => {
+    if (!settings || !globalSettings) return;
 
     const updatedPaths = {
       ...settings.setupPaths,
       [game]: value.trim() || null,
-    }
+    };
 
-    setSettings({ ...settings, setupPaths: updatedPaths })
+    setSettings({ ...settings, setupPaths: updatedPaths });
 
     try {
       await persist({
         ...globalSettings,
         setupPaths: updatedPaths,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save setup path:", error)
+      console.error("Failed to save setup path:", error);
     }
-  }
+  };
 
   const handleConnectionSettingChange = async (
     game: GameConnectionKey,
     field: keyof ConnectionDetails,
-    value: string
+    value: string,
   ) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    const currentGameSettings = settings.connectionSettings[game]
-    let updatedGameSettings: ConnectionDetails
+    const currentGameSettings = settings.connectionSettings[game];
+    let updatedGameSettings: ConnectionDetails;
 
     if (field === "port") {
-      const portValue = Math.min(65535, Math.max(0, Number(value) || 0))
-      updatedGameSettings = { ...currentGameSettings, port: portValue }
+      const portValue = Math.min(65535, Math.max(0, Number(value) || 0));
+      updatedGameSettings = { ...currentGameSettings, port: portValue };
     } else if (field === "host") {
-      updatedGameSettings = { ...currentGameSettings, host: value }
+      updatedGameSettings = { ...currentGameSettings, host: value };
     } else if (field === "connectionPassword") {
-      updatedGameSettings = { ...currentGameSettings, connectionPassword: value }
+      updatedGameSettings = { ...currentGameSettings, connectionPassword: value };
     } else {
-      updatedGameSettings = { ...currentGameSettings, commandPassword: value }
+      updatedGameSettings = { ...currentGameSettings, commandPassword: value };
     }
 
     const updatedConnectionSettings = {
       ...settings.connectionSettings,
       [game]: updatedGameSettings,
-    }
+    };
 
     setSettings({
       ...settings,
       connectionSettings: updatedConnectionSettings,
-    })
+    });
 
     try {
       await persist({
         ...globalSettings,
         connectionSettings: updatedConnectionSettings,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save connection setting:", error)
+      console.error("Failed to save connection setting:", error);
     }
-  }
+  };
 
   if (!settings) {
-    return null
+    return null;
   }
 
   return (
@@ -360,7 +373,7 @@ export function SettingsPage() {
           <SettingsSection eyebrow="Telemetry">
             <div className="divide-y divide-border">
               {GAME_OPTIONS.map((game) => {
-                const config = settings.connectionSettings[game.value]
+                const config = settings.connectionSettings[game.value];
                 return (
                   <TelemetryAppRow
                     key={game.value}
@@ -369,7 +382,7 @@ export function SettingsPage() {
                     port={config.port}
                     onConfigure={() => setActiveConnectionGame(game.value)}
                   />
-                )
+                );
               })}
             </div>
           </SettingsSection>
@@ -404,25 +417,19 @@ export function SettingsPage() {
         game={activeConnectionGame}
         settings={settings.connectionSettings}
         onOpenChange={(open) => {
-          if (!open) setActiveConnectionGame(null)
+          if (!open) setActiveConnectionGame(null);
         }}
         onFieldChange={handleConnectionSettingChange}
         t={t}
       />
     </>
-  )
+  );
 }
 
 const controlClassName =
-  "h-11 w-full rounded-[var(--radius-lg)] border-border bg-input text-sm text-foreground shadow-none placeholder:text-muted-foreground focus-visible:ring-ring/30"
+  "h-11 w-full rounded-[var(--radius-lg)] border-border bg-input text-sm text-foreground shadow-none placeholder:text-muted-foreground focus-visible:ring-ring/30";
 
-function SettingsSection({
-  eyebrow,
-  children,
-}: {
-  eyebrow: string
-  children: React.ReactNode
-}) {
+function SettingsSection({ eyebrow, children }: { eyebrow: string; children: React.ReactNode }) {
   return (
     <section className="space-y-3">
       <div className="space-y-1 px-1">
@@ -434,7 +441,7 @@ function SettingsSection({
         {children}
       </div>
     </section>
-  )
+  );
 }
 
 function SettingsRow({
@@ -442,9 +449,9 @@ function SettingsRow({
   description,
   control,
 }: {
-  title: string
-  description: string
-  control: React.ReactNode
+  title: string;
+  description: string;
+  control: React.ReactNode;
 }) {
   return (
     <div className="grid gap-4 border-b border-border px-4 py-5 last:border-b-0 md:grid-cols-[minmax(0,1fr)_minmax(220px,280px)] md:items-center md:px-6">
@@ -454,7 +461,7 @@ function SettingsRow({
       </div>
       <div className="md:justify-self-end md:w-full md:max-w-[280px]">{control}</div>
     </div>
-  )
+  );
 }
 
 function TelemetryAppRow({
@@ -463,10 +470,10 @@ function TelemetryAppRow({
   port,
   onConfigure,
 }: {
-  label: string
-  host: string
-  port: number
-  onConfigure: () => void
+  label: string;
+  host: string;
+  port: number;
+  onConfigure: () => void;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-5 md:px-6">
@@ -481,7 +488,7 @@ function TelemetryAppRow({
         Configure
       </Button>
     </div>
-  )
+  );
 }
 
 function TelemetryConfigDialog({
@@ -491,14 +498,14 @@ function TelemetryConfigDialog({
   onFieldChange,
   t,
 }: {
-  game: GameConnectionKey | null
-  settings: GameConnectionSettings
-  onOpenChange: (open: boolean) => void
-  onFieldChange: (game: GameConnectionKey, field: keyof ConnectionDetails, value: string) => void
-  t: (key: string) => string
+  game: GameConnectionKey | null;
+  settings: GameConnectionSettings;
+  onOpenChange: (open: boolean) => void;
+  onFieldChange: (game: GameConnectionKey, field: keyof ConnectionDetails, value: string) => void;
+  t: (key: string) => string;
 }) {
-  const current = game ? settings[game] : null
-  const label = GAME_OPTIONS.find((option) => option.value === game)?.label ?? ""
+  const current = game ? settings[game] : null;
+  const label = GAME_OPTIONS.find((option) => option.value === game)?.label ?? "";
 
   return (
     <Dialog open={game !== null} onOpenChange={onOpenChange}>
@@ -555,20 +562,14 @@ function TelemetryConfigDialog({
         ) : null}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-function DialogField({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
+function DialogField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-2">
       <div className="text-sm font-medium text-foreground">{label}</div>
       {children}
     </div>
-  )
+  );
 }

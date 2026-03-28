@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { MapPin } from "lucide-react"
-import type { OverlayModule } from "../types"
+import { MapPin } from "lucide-react";
+import type { OverlayModule } from "../types";
 
 const MapOverlay: OverlayModule = {
   id: "map",
@@ -27,7 +27,6 @@ const MapOverlay: OverlayModule = {
       </div>
     </div>
   ),
-}
+};
 
-export default MapOverlay
-
+export default MapOverlay;

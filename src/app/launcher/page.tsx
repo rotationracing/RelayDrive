@@ -1,67 +1,111 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Spinner } from "@/components/ui/spinner"
-import { useAppBootstrap } from "@/contexts/AppBootstrapContext"
-import { useProcess } from "@/contexts/ProcessContext"
-import { useSettingsContext } from "@/contexts/SettingsContext"
-import { useUser } from "@/contexts/UserContext"
-import { initDeepLinkListener } from "@/services/deep-link"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { createUser, exchangeToken, fetchMe, getAuth, installUpdate, isAuthExpired, openUrlCmd, saveAuth } from "../tauri-bridge"
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Spinner } from "@/components/ui/spinner";
+import { useAppBootstrap } from "@/contexts/AppBootstrapContext";
+import { useProcess } from "@/contexts/ProcessContext";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useUser } from "@/contexts/UserContext";
+import { initDeepLinkListener } from "@/services/deep-link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import {
+  createUser,
+  exchangeToken,
+  fetchMe,
+  getAuth,
+  installUpdate,
+  isAuthExpired,
+  openUrlCmd,
+  saveAuth,
+} from "../tauri-bridge";
 
 type GameDefinition = {
-  key: string
-  label: string
-  image: string
-  route: string
-  description: string
-  wip?: boolean
-}
+  key: string;
+  label: string;
+  image: string;
+  route: string;
+  description: string;
+  wip?: boolean;
+};
 
 const games: GameDefinition[] = [
-  { key: "iRacing", label: "iRacing", image: "/launcher/iracing.webp", route: "/iracing", description: "iRacing Integration", wip: true },
-  { key: "LMU", label: "LMU", image: "/launcher/lmu.webp", route: "/lmu", description: "Le Mans Ultimate Integration", wip: true },
-  { key: "ACC", label: "ACC", image: "/launcher/acc.webp", route: "/acc", description: "Assetto Corsa Competizione Integration" },
-]
+  {
+    key: "iRacing",
+    label: "iRacing",
+    image: "/launcher/iracing.webp",
+    route: "/iracing",
+    description: "iRacing Integration",
+    wip: true,
+  },
+  {
+    key: "LMU",
+    label: "LMU",
+    image: "/launcher/lmu.webp",
+    route: "/lmu",
+    description: "Le Mans Ultimate Integration",
+    wip: true,
+  },
+  {
+    key: "ACC",
+    label: "ACC",
+    image: "/launcher/acc.webp",
+    route: "/acc",
+    description: "Assetto Corsa Competizione Integration",
+  },
+];
 
 export default function LauncherPage() {
-  const router = useRouter()
-  const [reauthOpen, setReauthOpen] = useState(false)
-  const [authWaiting, setAuthWaiting] = useState(false)
-  const { user, refresh: refreshUser } = useUser()
-  const { settings } = useSettingsContext()
-  const { updateInfo, checkingUpdate, appVersion, ensureUpdateCheck, isLaunching, setIsLaunching, launchingLabel, setLaunchingLabel } = useAppBootstrap()
-  const [updating, setUpdating] = useState(false)
-  const [downloadedBytes, setDownloadedBytes] = useState(0)
-  const [contentLength, setContentLength] = useState<number | null>(null)
-  const [wipGame, setWipGame] = useState<GameDefinition | null>(null)
-  const [lastWipLabel, setLastWipLabel] = useState<string | null>(null)
-  const { monitorGame, stopMonitoring } = useProcess()
+  const router = useRouter();
+  const [reauthOpen, setReauthOpen] = useState(false);
+  const [authWaiting, setAuthWaiting] = useState(false);
+  const { user, refresh: refreshUser } = useUser();
+  const { settings } = useSettingsContext();
+  const {
+    updateInfo,
+    checkingUpdate,
+    appVersion,
+    ensureUpdateCheck,
+    isLaunching,
+    setIsLaunching,
+    launchingLabel,
+    setLaunchingLabel,
+  } = useAppBootstrap();
+  const [updating, setUpdating] = useState(false);
+  const [downloadedBytes, setDownloadedBytes] = useState(0);
+  const [contentLength, setContentLength] = useState<number | null>(null);
+  const [wipGame, setWipGame] = useState<GameDefinition | null>(null);
+  const [lastWipLabel, setLastWipLabel] = useState<string | null>(null);
+  const { monitorGame, stopMonitoring } = useProcess();
 
   const handleSelect = async (game: GameDefinition) => {
     if (game.wip) {
-      setWipGame(game)
-      setLastWipLabel(game.label)
-      return
+      setWipGame(game);
+      setLastWipLabel(game.label);
+      return;
     }
 
     try {
-      setLaunchingLabel(game.label)
-      setIsLaunching(true)
-      await monitorGame(game.key)
-      router.push(game.route)
+      setLaunchingLabel(game.label);
+      setIsLaunching(true);
+      await monitorGame(game.key);
+      router.push(game.route);
     } catch (e) {
-      console.error("Failed to set active game", e)
-      setIsLaunching(false)
-      setLaunchingLabel(null)
-      router.push(game.route) // still allow navigation
+      console.error("Failed to set active game", e);
+      setIsLaunching(false);
+      setLaunchingLabel(null);
+      router.push(game.route); // still allow navigation
     }
-  }
+  };
 
   // Check token validity on entry (use in-memory user)
   useEffect(() => {
@@ -78,27 +122,27 @@ export default function LauncherPage() {
         console.debug("auth check failed", err);
       }
     })();
-  }, [user])
+  }, [user]);
 
   useEffect(() => {
     if (wipGame?.label) {
-      setLastWipLabel(wipGame.label)
-      return
+      setLastWipLabel(wipGame.label);
+      return;
     }
 
-    const timeout = lastWipLabel ? setTimeout(() => setLastWipLabel(null), 240) : null
+    const timeout = lastWipLabel ? setTimeout(() => setLastWipLabel(null), 240) : null;
     return () => {
-      if (timeout) clearTimeout(timeout)
-    }
-  }, [wipGame, lastWipLabel])
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [wipGame, lastWipLabel]);
 
   useEffect(() => {
-    void ensureUpdateCheck()
-  }, [ensureUpdateCheck])
+    void ensureUpdateCheck();
+  }, [ensureUpdateCheck]);
 
   useEffect(() => {
-    stopMonitoring()
-  }, [stopMonitoring])
+    stopMonitoring();
+  }, [stopMonitoring]);
 
   const handleInstallUpdate = async () => {
     try {
@@ -106,18 +150,17 @@ export default function LauncherPage() {
       setDownloadedBytes(0);
       setContentLength(null);
       await installUpdate((ev) => {
-        if (ev.event === 'Started') {
+        if (ev.event === "Started") {
           setContentLength(ev.data?.contentLength ?? null);
-        } else if (ev.event === 'Progress') {
-          setDownloadedBytes(prev => prev + ev.data.chunkLength);
+        } else if (ev.event === "Progress") {
+          setDownloadedBytes((prev) => prev + ev.data.chunkLength);
         }
       });
     } catch (e) {
-      console.error('failed to install update', e);
+      console.error("failed to install update", e);
       setUpdating(false);
     }
-  }
-
+  };
 
   const handleContinueWithout = async () => {
     try {
@@ -128,7 +171,7 @@ export default function LauncherPage() {
     } catch (err) {
       console.error("failed to switch to local account", err);
     }
-  }
+  };
 
   const handleLogin = async () => {
     setAuthWaiting(true);
@@ -165,10 +208,12 @@ export default function LauncherPage() {
       } catch (err) {
         console.error("auth callback handling failed", err);
       } finally {
-        try { unsub?.(); } catch {}
+        try {
+          unsub?.();
+        } catch {}
       }
     });
-  }
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -178,7 +223,8 @@ export default function LauncherPage() {
           <DialogHeader>
             <DialogTitle>Sign in required</DialogTitle>
             <DialogDescription>
-              Your session has expired. Log in again to continue with your account, or continue without an account.
+              Your session has expired. Log in again to continue with your account, or continue
+              without an account.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
@@ -204,11 +250,15 @@ export default function LauncherPage() {
           <DialogHeader>
             <DialogTitle>Continue in your browser</DialogTitle>
             <DialogDescription>
-              We opened RelayDrive login in your default browser. Complete the sign-in there and keep this window open.
+              We opened RelayDrive login in your default browser. Complete the sign-in there and
+              keep this window open.
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="size-5 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-label="loading" />
+            <div
+              className="size-5 rounded-full border-2 border-white/30 border-t-white animate-spin"
+              aria-label="loading"
+            />
             <span className="text-sm text-muted-foreground">Waiting for authentication...</span>
           </div>
           <div className="mt-4 flex justify-end">
@@ -242,23 +292,30 @@ export default function LauncherPage() {
           ))}
         </div>
       </div>
-      <Dialog open={!!wipGame} onOpenChange={(open) => {
-        if (!open) {
-          setWipGame(null)
-        }
-      }}>
+      <Dialog
+        open={!!wipGame}
+        onOpenChange={(open) => {
+          if (!open) {
+            setWipGame(null);
+          }
+        }}
+      >
         {(wipGame || lastWipLabel) && (
-          <DialogContent showCloseButton={false} className="sm:max-w-sm border-none bg-transparent p-0 shadow-none">
+          <DialogContent
+            showCloseButton={false}
+            className="sm:max-w-sm border-none bg-transparent p-0 shadow-none"
+          >
             <Card className="rounded-lg border-white/10 bg-background/95 text-center shadow-lg backdrop-blur">
               <CardHeader className="space-y-2 text-center">
                 <DialogTitle asChild>
                   <CardTitle className="text-xl sm:text-2xl">
-                    {(wipGame?.label ?? lastWipLabel) ?? "Integration"} integration in development
+                    {wipGame?.label ?? lastWipLabel ?? "Integration"} integration in development
                   </CardTitle>
                 </DialogTitle>
                 <DialogDescription asChild>
                   <CardDescription className="mx-auto max-w-xs">
-                    We&apos;re still building the {(wipGame?.label ?? lastWipLabel) ?? ""} experience. Join the community for updates or read the RelayDrive blog.
+                    We&apos;re still building the {wipGame?.label ?? lastWipLabel ?? ""} experience.
+                    Join the community for updates or read the RelayDrive blog.
                   </CardDescription>
                 </DialogDescription>
               </CardHeader>
@@ -275,7 +332,11 @@ export default function LauncherPage() {
                   asChild
                   className="rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10"
                 >
-                  <a href="https://relaydrive.rotationracing.eu/blog" target="_blank" rel="noreferrer">
+                  <a
+                    href="https://relaydrive.rotationracing.eu/blog"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     View the Blog
                   </a>
                 </Button>
@@ -287,47 +348,54 @@ export default function LauncherPage() {
       {/* Sticky footer updates bar (only when setting enabled) */}
       {settings?.checkForUpdates && (
         <div
-          className={
-            `fixed bottom-0 left-0 right-0 z-20 border-t ${updateInfo ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-100" : "bg-white/5 border-white/10"}`
-          }
+          className={`fixed bottom-0 left-0 right-0 z-20 border-t ${updateInfo ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-100" : "bg-white/5 border-white/10"}`}
         >
           <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between gap-3 text-sm">
             <div className="flex items-center gap-2 min-h-7">
               {checkingUpdate ? (
                 <>
-                  <div className="size-3 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-label="checking" />
+                  <div
+                    className="size-3 rounded-full border-2 border-white/30 border-t-white animate-spin"
+                    aria-label="checking"
+                  />
                   <span className="opacity-80">Checking for updates…</span>
                 </>
               ) : updateInfo ? (
                 <>
                   <span className="opacity-80">Update available</span>
                   <span className="font-medium">{updateInfo.version}</span>
-                  <span className="opacity-40">(current {(updateInfo.currentVersion || appVersion || '—')})</span>
+                  <span className="opacity-40">
+                    (current {updateInfo.currentVersion || appVersion || "—"})
+                  </span>
                 </>
               ) : (
                 <>
                   <span className="opacity-80">Up to date</span>
-                  {appVersion && (
-                    <span className="opacity-60"> — version {appVersion}</span>
-                  )}
+                  {appVersion && <span className="opacity-60"> — version {appVersion}</span>}
                 </>
               )}
             </div>
             {/* Right control area with fixed height/width to avoid bar size changes */}
-            <div className="flex items-center justify-end" style={{ minHeight: '1.75rem', minWidth: '92px' }}>
+            <div
+              className="flex items-center justify-end"
+              style={{ minHeight: "1.75rem", minWidth: "92px" }}
+            >
               {updateInfo ? (
                 updating ? (
                   <div className="flex items-center gap-2 text-xs opacity-80">
-                    <div className="size-4 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-label="downloading" />
+                    <div
+                      className="size-4 rounded-full border-2 border-white/30 border-t-white animate-spin"
+                      aria-label="downloading"
+                    />
                     <span>
-                      {contentLength ? `${Math.min(100, Math.floor((downloadedBytes / contentLength) * 100))}%` : 'Downloading…'}
+                      {contentLength
+                        ? `${Math.min(100, Math.floor((downloadedBytes / contentLength) * 100))}%`
+                        : "Downloading…"}
                     </span>
                   </div>
                 ) : (
                   <button
-                    className={
-                      `rounded-md px-3 py-1.5 text-xs ${updateInfo ? "bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 text-yellow-100" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`
-                    }
+                    className={`rounded-md px-3 py-1.5 text-xs ${updateInfo ? "bg-yellow-500/20 hover:bg-yellow-500/30 border border-yellow-500/40 text-yellow-100" : "border border-white/10 bg-white/5 text-white hover:bg-white/10"}`}
                     onClick={handleInstallUpdate}
                   >
                     Update
@@ -345,12 +413,10 @@ export default function LauncherPage() {
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-background/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3">
             <Spinner className="size-8" />
-            <div className="text-sm text-muted-foreground">
-              Loading…
-            </div>
+            <div className="text-sm text-muted-foreground">Loading…</div>
           </div>
         </div>
       )}
     </div>
-  )
+  );
 }

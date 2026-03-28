@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { type UnlistenFn, listen } from "@tauri-apps/api/event"
-import { Timer } from "lucide-react"
-import { useEffect, useState, useRef } from "react"
-import type { OverlayModule } from "../types"
+import { type UnlistenFn, listen } from "@tauri-apps/api/event";
+import { Timer } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import type { OverlayModule } from "../types";
 
 interface GraphicsEventPayload {
   data?: {
-    delta_lap_time_str?: string
-    delta_lap_time?: number
-    is_delta_positive?: boolean
-    last_time_str?: string
-    completed_lap?: number
-  } | null
+    delta_lap_time_str?: string;
+    delta_lap_time?: number;
+    is_delta_positive?: boolean;
+    last_time_str?: string;
+    completed_lap?: number;
+  } | null;
 }
 
 const DeltaBarOverlay: OverlayModule = {
@@ -157,119 +157,159 @@ const DeltaBarOverlay: OverlayModule = {
     },
   },
   Component: ({ opacity, moveMode, componentSettings }) => {
-    const [deltaTime, setDeltaTime] = useState<number | null>(null)
-    const [deltaString, setDeltaString] = useState<string>("+0.000")
-    const [isPositiveFlag, setIsPositiveFlag] = useState<boolean | null>(null)
-    const [showLapTime, setShowLapTime] = useState(false)
-    const [lapTimeString, setLapTimeString] = useState<string>("")
-    const completedLapsRef = useRef<number>(0)
+    const [deltaTime, setDeltaTime] = useState<number | null>(null);
+    const [deltaString, setDeltaString] = useState<string>("+0.000");
+    const [isPositiveFlag, setIsPositiveFlag] = useState<boolean | null>(null);
+    const [showLapTime, setShowLapTime] = useState(false);
+    const [lapTimeString, setLapTimeString] = useState<string>("");
+    const completedLapsRef = useRef<number>(0);
 
     useEffect(() => {
-      let unlisten: UnlistenFn | null = null
-      let mounted = true
-      let lapTimeTimeout: ReturnType<typeof setTimeout> | null = null
+      let unlisten: UnlistenFn | null = null;
+      let mounted = true;
+      let lapTimeTimeout: ReturnType<typeof setTimeout> | null = null;
 
       // Read settings inside useEffect to access latest values
-      const showLapTimeOnFinish = (componentSettings?.showLapTimeOnFinish as boolean) ?? true
-      const lapTimeDisplayDuration = (componentSettings?.lapTimeDisplayDuration as number) ?? 2000
+      const showLapTimeOnFinish = (componentSettings?.showLapTimeOnFinish as boolean) ?? true;
+      const lapTimeDisplayDuration = (componentSettings?.lapTimeDisplayDuration as number) ?? 2000;
 
       const setupListener = async () => {
         try {
           unlisten = await listen<GraphicsEventPayload>("acc://graphics", (event) => {
-            if (!mounted) return
-            const data = event.payload?.data
+            if (!mounted) return;
+            const data = event.payload?.data;
             if (data) {
               // Detect lap completion
               if (data.completed_lap !== undefined && data.completed_lap !== null) {
                 if (data.completed_lap > completedLapsRef.current) {
                   // Lap just completed
-                  completedLapsRef.current = data.completed_lap
+                  completedLapsRef.current = data.completed_lap;
                   if (data.last_time_str && showLapTimeOnFinish) {
-                    setLapTimeString(data.last_time_str)
-                    setShowLapTime(true)
+                    setLapTimeString(data.last_time_str);
+                    setShowLapTime(true);
                     // Clear any existing timeout
                     if (lapTimeTimeout) {
-                      clearTimeout(lapTimeTimeout)
+                      clearTimeout(lapTimeTimeout);
                     }
                     // Hide lap time after configured duration
                     lapTimeTimeout = setTimeout(() => {
                       if (mounted) {
-                        setShowLapTime(false)
+                        setShowLapTime(false);
                       }
-                    }, lapTimeDisplayDuration)
+                    }, lapTimeDisplayDuration);
                   }
                 }
               }
 
               if (data.delta_lap_time !== undefined && data.delta_lap_time !== null) {
-                const deltaSeconds = data.delta_lap_time / 1000
-                setDeltaTime(deltaSeconds)
+                const deltaSeconds = data.delta_lap_time / 1000;
+                setDeltaTime(deltaSeconds);
               }
-              if (data.delta_lap_time_str) setDeltaString(data.delta_lap_time_str)
-              if (data.is_delta_positive !== undefined) setIsPositiveFlag(data.is_delta_positive)
+              if (data.delta_lap_time_str) setDeltaString(data.delta_lap_time_str);
+              if (data.is_delta_positive !== undefined) setIsPositiveFlag(data.is_delta_positive);
             }
-          })
+          });
         } catch (error) {
-          console.error("Failed to listen to ACC graphics events in delta bar:", error)
+          console.error("Failed to listen to ACC graphics events in delta bar:", error);
         }
-      }
+      };
 
-      void setupListener()
+      void setupListener();
       return () => {
-        mounted = false
+        mounted = false;
         if (lapTimeTimeout) {
-          clearTimeout(lapTimeTimeout)
+          clearTimeout(lapTimeTimeout);
         }
-        unlisten?.()
-      }
-    }, [componentSettings?.showLapTimeOnFinish, componentSettings?.lapTimeDisplayDuration])
+        unlisten?.();
+      };
+    }, [componentSettings?.showLapTimeOnFinish, componentSettings?.lapTimeDisplayDuration]);
 
-    const dt = deltaTime ?? 0
-    const isSlower = dt > 0 // slower = red (positive), faster = green (negative)
+    const dt = deltaTime ?? 0;
+    const isSlower = dt > 0; // slower = red (positive), faster = green (negative)
 
     // smoother scaling (no hard max)
-    const sensitivity = 1.0
-    const scaled = Math.atan(Math.abs(dt) * sensitivity) / (Math.PI / 2)
+    const sensitivity = 1.0;
+    const scaled = Math.atan(Math.abs(dt) * sensitivity) / (Math.PI / 2);
 
-    const leftAligned = (componentSettings?.leftAligned as boolean) ?? false
-    const textAlignment = (componentSettings?.textAlignment as string) ?? "middle"
-    const textPosition = (componentSettings?.textPosition as string) ?? "inside"
-    const centerGapPx = 10
-    const barHeight = (componentSettings?.height as number) ?? 32
-    const barWidth = (componentSettings?.width as number) ?? 520
-    const fontSize = (componentSettings?.fontSize as number) ?? 24
-    const radius = 6
+    const leftAligned = (componentSettings?.leftAligned as boolean) ?? false;
+    const textAlignment = (componentSettings?.textAlignment as string) ?? "middle";
+    const textPosition = (componentSettings?.textPosition as string) ?? "inside";
+    const centerGapPx = 10;
+    const barHeight = (componentSettings?.height as number) ?? 32;
+    const barWidth = (componentSettings?.width as number) ?? 520;
+    const fontSize = (componentSettings?.fontSize as number) ?? 24;
+    const radius = 6;
 
     // Calculate fill percentage based on alignment
-    const fillPct = leftAligned ? scaled * 100 : scaled * 50 // max full width for left-aligned, half width each side for center
+    const fillPct = leftAligned ? scaled * 100 : scaled * 50; // max full width for left-aligned, half width each side for center
 
     // Get colors from settings with defaults
-    const positiveBarColor = (componentSettings?.positiveBarColor as [number, number, number, number]) ?? [16, 185, 129, 0.9]
-    const negativeBarColor = (componentSettings?.negativeBarColor as [number, number, number, number]) ?? [239, 68, 68, 0.9]
-    const positiveTextColor = (componentSettings?.positiveTextColor as [number, number, number, number]) ?? [52, 211, 153, 1]
-    const negativeTextColor = (componentSettings?.negativeTextColor as [number, number, number, number]) ?? [248, 113, 113, 1]
-    const backgroundColor = (componentSettings?.backgroundColor as [number, number, number, number]) ?? [0, 0, 0, 0.8]
+    const positiveBarColor = (componentSettings?.positiveBarColor as [
+      number,
+      number,
+      number,
+      number,
+    ]) ?? [16, 185, 129, 0.9];
+    const negativeBarColor = (componentSettings?.negativeBarColor as [
+      number,
+      number,
+      number,
+      number,
+    ]) ?? [239, 68, 68, 0.9];
+    const positiveTextColor = (componentSettings?.positiveTextColor as [
+      number,
+      number,
+      number,
+      number,
+    ]) ?? [52, 211, 153, 1];
+    const negativeTextColor = (componentSettings?.negativeTextColor as [
+      number,
+      number,
+      number,
+      number,
+    ]) ?? [248, 113, 113, 1];
+    const backgroundColor = (componentSettings?.backgroundColor as [
+      number,
+      number,
+      number,
+      number,
+    ]) ?? [0, 0, 0, 0.8];
 
     // Convert color arrays to rgba strings
-    const rgba = (color: [number, number, number, number]) => `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`
-    const rgb = (color: [number, number, number, number]) => `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+    const rgba = (color: [number, number, number, number]) =>
+      `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+    const rgb = (color: [number, number, number, number]) =>
+      `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 
     // Create gradient colors with fade
-    const positiveBarColorFaded = [positiveBarColor[0], positiveBarColor[1], positiveBarColor[2], positiveBarColor[3] * 0.78] as [number, number, number, number]
-    const negativeBarColorFaded = [negativeBarColor[0], negativeBarColor[1], negativeBarColor[2], negativeBarColor[3] * 0.78] as [number, number, number, number]
+    const positiveBarColorFaded = [
+      positiveBarColor[0],
+      positiveBarColor[1],
+      positiveBarColor[2],
+      positiveBarColor[3] * 0.78,
+    ] as [number, number, number, number];
+    const negativeBarColorFaded = [
+      negativeBarColor[0],
+      negativeBarColor[1],
+      negativeBarColor[2],
+      negativeBarColor[3] * 0.78,
+    ] as [number, number, number, number];
 
     const displayNumeric =
-      deltaTime !== null ? `${dt < 0 ? "-" : "+"}${Math.abs(dt).toFixed(3)}` : deltaString
+      deltaTime !== null ? `${dt < 0 ? "-" : "+"}${Math.abs(dt).toFixed(3)}` : deltaString;
 
-    const textColor = isSlower ? rgb(negativeTextColor) : rgb(positiveTextColor)
+    const textColor = isSlower ? rgb(negativeTextColor) : rgb(positiveTextColor);
 
     // Render text component
     const renderText = () => (
       <div
-        className={`flex w-full items-center px-2 ${textAlignment === "left" ? "justify-start" :
-          textAlignment === "right" ? "justify-end" :
-            "justify-center"
-          }`}
+        className={`flex w-full items-center px-2 ${
+          textAlignment === "left"
+            ? "justify-start"
+            : textAlignment === "right"
+              ? "justify-end"
+              : "justify-center"
+        }`}
         style={{ height: textPosition === "inside" ? barHeight : "auto" }}
       >
         {showLapTime ? (
@@ -288,26 +328,37 @@ const DeltaBarOverlay: OverlayModule = {
           </span>
         )}
       </div>
-    )
+    );
 
     // Calculate total height including text when above/below
     // mb-1/mt-1 adds 4px, text needs fontSize * 1.2 for line-height, plus some padding
-    const textSpacing = textPosition !== "inside" ? 4 : 0 // mb-1 or mt-1 = 4px
-    const textLineHeight = textPosition !== "inside" ? fontSize * 1.2 : 0 // Account for line-height
-    const textHeight = textPosition !== "inside" ? textLineHeight + textSpacing + 8 : 0 // line-height + spacing + extra padding
-    const totalHeight = textPosition === "inside" ? barHeight : barHeight + textHeight
+    const textSpacing = textPosition !== "inside" ? 4 : 0; // mb-1 or mt-1 = 4px
+    const textLineHeight = textPosition !== "inside" ? fontSize * 1.2 : 0; // Account for line-height
+    const textHeight = textPosition !== "inside" ? textLineHeight + textSpacing + 8 : 0; // line-height + spacing + extra padding
+    const totalHeight = textPosition === "inside" ? barHeight : barHeight + textHeight;
 
     return (
-      <div className="flex flex-col items-start overflow-visible" style={{ width: barWidth, minHeight: totalHeight }}>
+      <div
+        className="flex flex-col items-start overflow-visible"
+        style={{ width: barWidth, minHeight: totalHeight }}
+      >
         {/* Text above bar */}
         {textPosition === "above" && (
-          <div className="w-full mb-1 flex-shrink-0">
-            {renderText()}
-          </div>
+          <div className="w-full mb-1 flex-shrink-0">{renderText()}</div>
         )}
 
         {/* Bar container */}
-        <div className="relative flex w-full items-center justify-center overflow-hidden flex-shrink-0" style={{ width: barWidth, height: barHeight, minHeight: barHeight, maxHeight: barHeight, cursor: moveMode ? "move" : "default", borderRadius: radius }}>
+        <div
+          className="relative flex w-full items-center justify-center overflow-hidden flex-shrink-0"
+          style={{
+            width: barWidth,
+            height: barHeight,
+            minHeight: barHeight,
+            maxHeight: barHeight,
+            cursor: moveMode ? "move" : "default",
+            borderRadius: radius,
+          }}
+        >
           {/* Background */}
           <div
             className="absolute inset-0"
@@ -411,21 +462,17 @@ const DeltaBarOverlay: OverlayModule = {
 
           {/* Text inside bar */}
           {textPosition === "inside" && (
-            <div className="absolute inset-0 z-10 w-full flex items-center">
-              {renderText()}
-            </div>
+            <div className="absolute inset-0 z-10 w-full flex items-center">{renderText()}</div>
           )}
         </div>
 
         {/* Text under bar */}
         {textPosition === "under" && (
-          <div className="w-full mt-1 flex-shrink-0">
-            {renderText()}
-          </div>
+          <div className="w-full mt-1 flex-shrink-0">{renderText()}</div>
         )}
       </div>
-    )
+    );
   },
-}
+};
 
-export default DeltaBarOverlay
+export default DeltaBarOverlay;

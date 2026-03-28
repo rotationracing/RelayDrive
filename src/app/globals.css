@@ -71,7 +71,9 @@
   background: rgba(var(--color-muted-foreground-rgb), 0.3);
   border-radius: 8px;
   min-height: 40px;
-  transition: background 0.2s, width 0.2s;
+  transition:
+    background 0.2s,
+    width 0.2s;
 }
 
 /* On hover: expand and animate */
@@ -164,9 +166,11 @@
   body {
     @apply bg-background text-foreground select-none; /* Disable text selection app-wide like a native client */
   }
-  
+
   /* Re-enable text selection specifically for form elements where users need it */
-  input, textarea, [contenteditable="true"] {
+  input,
+  textarea,
+  [contenteditable="true"] {
     @apply select-auto cursor-text;
   }
 

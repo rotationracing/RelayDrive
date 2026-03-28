@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import type { CarInfo, SetupEntry, TrackInfo, SetupImportData } from "@/app/tauri-bridge"
+import type { CarInfo, SetupEntry, TrackInfo, SetupImportData } from "@/app/tauri-bridge";
 import {
   completeSetupImport,
   deleteSetupFile,
@@ -11,8 +11,8 @@ import {
   prepareSetupImport,
   readSetupFile,
   renameSetupFile,
-} from "@/app/tauri-bridge"
-import { Button } from "@/components/ui/button"
+} from "@/app/tauri-bridge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -20,10 +20,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   Check,
   ChevronDown,
@@ -45,300 +45,308 @@ import {
   Shield,
   SlidersHorizontal,
   Trash2,
-} from "lucide-react"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { toast } from "sonner"
+} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 interface CarSetups {
-  car: CarInfo
-  tracks: Map<string, SetupEntry[]>
+  car: CarInfo;
+  tracks: Map<string, SetupEntry[]>;
 }
 
 interface ParsedSetup {
-  carName?: string
+  carName?: string;
   basicSetup?: {
-    tyres?: Record<string, unknown>
-    alignment?: Record<string, unknown>
+    tyres?: Record<string, unknown>;
+    alignment?: Record<string, unknown>;
     electronics?: {
-      tC1?: number
-      tC2?: number
-      abs?: number
-      eCUMap?: number
-      fuelMix?: number
-      telemetryLaps?: number
-    }
+      tC1?: number;
+      tC2?: number;
+      abs?: number;
+      eCUMap?: number;
+      fuelMix?: number;
+      telemetryLaps?: number;
+    };
     strategy?: {
-      fuel?: number
-      nPitStops?: number
-      tyreSet?: number
-      frontBrakePadCompound?: number
-      rearBrakePadCompound?: number
-      pitStrategy?: unknown[]
-      fuelPerLap?: number
-    }
-  }
-  advancedSetup?: Record<string, unknown>
-  trackBopType?: number
+      fuel?: number;
+      nPitStops?: number;
+      tyreSet?: number;
+      frontBrakePadCompound?: number;
+      rearBrakePadCompound?: number;
+      pitStrategy?: unknown[];
+      fuelPerLap?: number;
+    };
+  };
+  advancedSetup?: Record<string, unknown>;
+  trackBopType?: number;
 }
 
-const normalizeId = (value: string) => value.trim().toLowerCase()
-const stripJsonExtension = (value: string) => value.replace(/\.json$/i, "")
-const getFileNameFromPath = (value: string) => value.split(/[\\/]/).pop() ?? value
+const normalizeId = (value: string) => value.trim().toLowerCase();
+const stripJsonExtension = (value: string) => value.replace(/\.json$/i, "");
+const getFileNameFromPath = (value: string) => value.split(/[\\/]/).pop() ?? value;
 
 function SetupPage() {
-  const [cars, setCars] = useState<CarInfo[]>([])
-  const [tracks, setTracks] = useState<TrackInfo[]>([])
-  const [setups, setSetups] = useState<SetupEntry[]>([])
-  const [expandedCars, setExpandedCars] = useState<Set<string>>(new Set())
-  const [expandedTracks, setExpandedTracks] = useState<Set<string>>(new Set())
-  const [selectedSetup, setSelectedSetup] = useState<SetupEntry | null>(null)
-  const [setupContent, setSetupContent] = useState<string>("")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [isRenameOpen, setIsRenameOpen] = useState(false)
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [newName, setNewName] = useState("")
-  const [isImportOpen, setIsImportOpen] = useState(false)
-  const [importStep, setImportStep] = useState<"source" | "destination">("source")
-  const [importMode, setImportMode] = useState<"file" | "code">("file")
-  const [importData, setImportData] = useState<SetupImportData | null>(null)
-  const [selectedTrack, setSelectedTrack] = useState<string | null>(null)
-  const [importSetupName, setImportSetupName] = useState("")
-  const [importCode, setImportCode] = useState("")
-  const [isImporting, setIsImporting] = useState(false)
-  const [trackSearch, setTrackSearch] = useState("")
+  const [cars, setCars] = useState<CarInfo[]>([]);
+  const [tracks, setTracks] = useState<TrackInfo[]>([]);
+  const [setups, setSetups] = useState<SetupEntry[]>([]);
+  const [expandedCars, setExpandedCars] = useState<Set<string>>(new Set());
+  const [expandedTracks, setExpandedTracks] = useState<Set<string>>(new Set());
+  const [selectedSetup, setSelectedSetup] = useState<SetupEntry | null>(null);
+  const [setupContent, setSetupContent] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importStep, setImportStep] = useState<"source" | "destination">("source");
+  const [importMode, setImportMode] = useState<"file" | "code">("file");
+  const [importData, setImportData] = useState<SetupImportData | null>(null);
+  const [selectedTrack, setSelectedTrack] = useState<string | null>(null);
+  const [importSetupName, setImportSetupName] = useState("");
+  const [importCode, setImportCode] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
+  const [trackSearch, setTrackSearch] = useState("");
 
   const loadData = useCallback(async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const [carsData, tracksData, setupsData] = await Promise.all([
         getAccCars(),
         getAccTracks(),
         listAccSetups(),
-      ])
-      setCars(carsData)
-      setTracks(tracksData)
-      setSetups(setupsData)
+      ]);
+      setCars(carsData);
+      setTracks(tracksData);
+      setSetups(setupsData);
     } catch (e) {
-      console.error("Failed to load setups:", e)
-      toast.error("Failed to load setups")
+      console.error("Failed to load setups:", e);
+      toast.error("Failed to load setups");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    loadData();
+  }, [loadData]);
 
   const carSetupTree = useMemo(() => {
-    const carMap = new Map<string, CarInfo>()
+    const carMap = new Map<string, CarInfo>();
     for (const car of cars) {
-      carMap.set(car.id, car)
+      carMap.set(car.id, car);
     }
 
-    const tree = new Map<string, CarSetups>()
+    const tree = new Map<string, CarSetups>();
 
     for (const setup of setups) {
       if (!tree.has(setup.carId)) {
-        const car = carMap.get(setup.carId)
+        const car = carMap.get(setup.carId);
         tree.set(setup.carId, {
-          car: car ?? { id: setup.carId, prettyName: setup.carId, fullName: setup.carId, brandName: "" },
+          car: car ?? {
+            id: setup.carId,
+            prettyName: setup.carId,
+            fullName: setup.carId,
+            brandName: "",
+          },
           tracks: new Map(),
-        })
+        });
       }
 
-      const carEntry = tree.get(setup.carId)
+      const carEntry = tree.get(setup.carId);
       if (!carEntry) {
-        continue
+        continue;
       }
       if (!carEntry.tracks.has(setup.trackId)) {
-        carEntry.tracks.set(setup.trackId, [])
+        carEntry.tracks.set(setup.trackId, []);
       }
-      const trackSetups = carEntry.tracks.get(setup.trackId)
+      const trackSetups = carEntry.tracks.get(setup.trackId);
       if (!trackSetups) {
-        continue
+        continue;
       }
-      trackSetups.push(setup)
+      trackSetups.push(setup);
     }
 
-    return Array.from(tree.values()).sort((a, b) =>
-      a.car.fullName.localeCompare(b.car.fullName)
-    )
-  }, [cars, setups])
+    return Array.from(tree.values()).sort((a, b) => a.car.fullName.localeCompare(b.car.fullName));
+  }, [cars, setups]);
 
   const trackMap = useMemo(() => {
-    const map = new Map<string, TrackInfo>()
+    const map = new Map<string, TrackInfo>();
     for (const track of tracks) {
-      map.set(normalizeId(track.id), track)
+      map.set(normalizeId(track.id), track);
     }
-    return map
-  }, [tracks])
+    return map;
+  }, [tracks]);
 
   const getTrackLabel = useCallback(
     (trackId: string) => trackMap.get(normalizeId(trackId))?.prettyName ?? trackId,
-    [trackMap]
-  )
+    [trackMap],
+  );
 
   const sortedTracks = useMemo(
     () => [...tracks].sort((a, b) => a.prettyName.localeCompare(b.prettyName)),
-    [tracks]
-  )
+    [tracks],
+  );
 
   const filteredTree = useMemo(() => {
-    if (!searchQuery.trim()) return carSetupTree
-    const q = searchQuery.toLowerCase()
+    if (!searchQuery.trim()) return carSetupTree;
+    const q = searchQuery.toLowerCase();
     return carSetupTree.filter(
       (cs) =>
         cs.car.fullName.toLowerCase().includes(q) ||
         cs.car.prettyName.toLowerCase().includes(q) ||
-        cs.car.brandName.toLowerCase().includes(q)
-    )
-  }, [carSetupTree, searchQuery])
+        cs.car.brandName.toLowerCase().includes(q),
+    );
+  }, [carSetupTree, searchQuery]);
 
   const toggleCar = useCallback((carId: string) => {
     setExpandedCars((prev) => {
-      const next = new Set(prev)
-      if (next.has(carId)) next.delete(carId)
-      else next.add(carId)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(carId)) next.delete(carId);
+      else next.add(carId);
+      return next;
+    });
+  }, []);
 
   const toggleTrack = useCallback((key: string) => {
     setExpandedTracks((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   const selectSetup = useCallback(async (setup: SetupEntry) => {
-    setSelectedSetup(setup)
+    setSelectedSetup(setup);
     try {
-      const content = await readSetupFile(setup.fullPath)
-      setSetupContent(content)
+      const content = await readSetupFile(setup.fullPath);
+      setSetupContent(content);
     } catch (e) {
-      console.error("Failed to read setup file:", e)
-      toast.error("Failed to read setup file")
-      setSetupContent("")
+      console.error("Failed to read setup file:", e);
+      toast.error("Failed to read setup file");
+      setSetupContent("");
     }
-  }, [])
+  }, []);
 
   const handleRename = useCallback(async () => {
-    if (!selectedSetup || !newName.trim()) return
+    if (!selectedSetup || !newName.trim()) return;
     try {
-      const cleanName = newName.replace(/\.json$/i, "")
-      const updatedPath = await renameSetupFile(selectedSetup.fullPath, cleanName)
-      const newFilename = `${cleanName}.json`
-      toast.success("Setup renamed successfully")
-      setSelectedSetup({ ...selectedSetup, filename: newFilename, fullPath: updatedPath })
-      setIsRenameOpen(false)
-      await loadData()
+      const cleanName = newName.replace(/\.json$/i, "");
+      const updatedPath = await renameSetupFile(selectedSetup.fullPath, cleanName);
+      const newFilename = `${cleanName}.json`;
+      toast.success("Setup renamed successfully");
+      setSelectedSetup({ ...selectedSetup, filename: newFilename, fullPath: updatedPath });
+      setIsRenameOpen(false);
+      await loadData();
     } catch (e) {
-      console.error("Failed to rename setup:", e)
-      toast.error("Failed to rename setup")
+      console.error("Failed to rename setup:", e);
+      toast.error("Failed to rename setup");
     }
-  }, [selectedSetup, newName, loadData])
+  }, [selectedSetup, newName, loadData]);
 
   const handleDelete = useCallback(async () => {
-    if (!selectedSetup) return
+    if (!selectedSetup) return;
     try {
-      await deleteSetupFile(selectedSetup.fullPath)
-      toast.success("Setup deleted")
-      setSelectedSetup(null)
-      setSetupContent("")
-      setIsDeleteOpen(false)
-      await loadData()
+      await deleteSetupFile(selectedSetup.fullPath);
+      toast.success("Setup deleted");
+      setSelectedSetup(null);
+      setSetupContent("");
+      setIsDeleteOpen(false);
+      await loadData();
     } catch (e) {
-      console.error("Failed to delete setup:", e)
-      toast.error("Failed to delete setup")
+      console.error("Failed to delete setup:", e);
+      toast.error("Failed to delete setup");
     }
-  }, [selectedSetup, loadData])
+  }, [selectedSetup, loadData]);
 
   const parsedSetup = useMemo<ParsedSetup | null>(() => {
-    if (!setupContent) return null
+    if (!setupContent) return null;
     try {
-      return JSON.parse(setupContent) as ParsedSetup
+      return JSON.parse(setupContent) as ParsedSetup;
     } catch {
-      return null
+      return null;
     }
-  }, [setupContent])
+  }, [setupContent]);
 
   const carInfo = useMemo(() => {
-    if (!selectedSetup) return null
-    return cars.find((c) => c.id === selectedSetup.carId) ?? null
-  }, [selectedSetup, cars])
+    if (!selectedSetup) return null;
+    return cars.find((c) => c.id === selectedSetup.carId) ?? null;
+  }, [selectedSetup, cars]);
 
   const refresh = useCallback(async () => {
-    await loadData()
-    toast.success("Setups refreshed")
-  }, [loadData])
+    await loadData();
+    toast.success("Setups refreshed");
+  }, [loadData]);
 
   const resetImportFlow = useCallback(() => {
-    setImportStep("source")
-    setImportMode("file")
-    setImportData(null)
-    setSelectedTrack(null)
-    setImportSetupName("")
-    setImportCode("")
-    setIsImporting(false)
-    setTrackSearch("")
-  }, [])
+    setImportStep("source");
+    setImportMode("file");
+    setImportData(null);
+    setSelectedTrack(null);
+    setImportSetupName("");
+    setImportCode("");
+    setIsImporting(false);
+    setTrackSearch("");
+  }, []);
 
-  const handleImportDialogChange = useCallback((open: boolean) => {
-    setIsImportOpen(open)
-    if (!open) {
-      resetImportFlow()
-    }
-  }, [resetImportFlow])
+  const handleImportDialogChange = useCallback(
+    (open: boolean) => {
+      setIsImportOpen(open);
+      if (!open) {
+        resetImportFlow();
+      }
+    },
+    [resetImportFlow],
+  );
 
   const loadImportData = useCallback(async (fileName: string, fileContent: string) => {
-    const data = await prepareSetupImport(fileName, fileContent)
-    setImportData(data)
-    setImportSetupName(stripJsonExtension(data.fileName))
-    setSelectedTrack(null)
-    setImportStep("destination")
-  }, [])
+    const data = await prepareSetupImport(fileName, fileContent);
+    setImportData(data);
+    setImportSetupName(stripJsonExtension(data.fileName));
+    setSelectedTrack(null);
+    setImportStep("destination");
+  }, []);
 
   const handleImportClick = useCallback(async () => {
     try {
-      const filePath = await openSetupFileDialog()
-      if (!filePath) return
+      const filePath = await openSetupFileDialog();
+      if (!filePath) return;
 
-      const fileContent = await readSetupFile(filePath)
-      await loadImportData(getFileNameFromPath(filePath), fileContent)
+      const fileContent = await readSetupFile(filePath);
+      await loadImportData(getFileNameFromPath(filePath), fileContent);
     } catch (e) {
-      console.error("Failed to import setup:", e)
-      toast.error("Failed to import setup")
+      console.error("Failed to import setup:", e);
+      toast.error("Failed to import setup");
     }
-  }, [loadImportData])
+  }, [loadImportData]);
 
   const handleCompleteImport = useCallback(async () => {
-    if (!importData || !selectedTrack || !importSetupName.trim()) return
+    if (!importData || !selectedTrack || !importSetupName.trim()) return;
 
-    setIsImporting(true)
+    setIsImporting(true);
     try {
       await completeSetupImport(
         importData.carId,
         selectedTrack,
         importSetupName,
         importData.fileContent,
-      )
-      toast.success("Setup imported successfully")
-      handleImportDialogChange(false)
-      await loadData()
+      );
+      toast.success("Setup imported successfully");
+      handleImportDialogChange(false);
+      await loadData();
     } catch (e) {
-      console.error("Failed to complete import:", e)
-      toast.error("Failed to import setup")
+      console.error("Failed to complete import:", e);
+      toast.error("Failed to import setup");
     } finally {
-      setIsImporting(false)
+      setIsImporting(false);
     }
-  }, [handleImportDialogChange, importData, importSetupName, loadData, selectedTrack])
+  }, [handleImportDialogChange, importData, importSetupName, loadData, selectedTrack]);
 
-  const selectedImportTrack = selectedTrack ? trackMap.get(normalizeId(selectedTrack)) ?? null : null
-  const importCarLabel = importData?.carInfo?.fullName ?? importData?.carName ?? "Unknown car"
+  const selectedImportTrack = selectedTrack
+    ? (trackMap.get(normalizeId(selectedTrack)) ?? null)
+    : null;
+  const importCarLabel = importData?.carInfo?.fullName ?? importData?.carName ?? "Unknown car";
 
   return (
     <div className="flex h-full">
@@ -364,12 +372,16 @@ function SetupPage() {
               <TooltipContent>Refresh</TooltipContent>
             </Tooltip>
             <Tooltip>
-             <TooltipTrigger asChild>
-               <Button variant="ghost" size="icon-sm" onClick={() => handleImportDialogChange(true)}>
-                 <Plus className="w-3.5 h-3.5" />
-               </Button>
-             </TooltipTrigger>
-             <TooltipContent>Add Setup</TooltipContent>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => handleImportDialogChange(true)}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add Setup</TooltipContent>
             </Tooltip>
           </div>
         </div>
@@ -388,7 +400,7 @@ function SetupPage() {
           ) : (
             <div className="py-1">
               {filteredTree.map((carSetups) => {
-                const isCarExpanded = expandedCars.has(carSetups.car.id)
+                const isCarExpanded = expandedCars.has(carSetups.car.id);
                 return (
                   <div key={carSetups.car.id}>
                     <button
@@ -411,8 +423,8 @@ function SetupPage() {
                       Array.from(carSetups.tracks.entries())
                         .sort(([a], [b]) => a.localeCompare(b))
                         .map(([trackId, trackSetups]) => {
-                          const trackKey = `${carSetups.car.id}::${trackId}`
-                          const isTrackExpanded = expandedTracks.has(trackKey)
+                          const trackKey = `${carSetups.car.id}::${trackId}`;
+                          const isTrackExpanded = expandedTracks.has(trackKey);
                           return (
                             <div key={trackKey}>
                               <button
@@ -425,37 +437,41 @@ function SetupPage() {
                                 ) : (
                                   <Folder className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                                 )}
-                                <span className="truncate text-muted-foreground">{getTrackLabel(trackId)}</span>
+                                <span className="truncate text-muted-foreground">
+                                  {getTrackLabel(trackId)}
+                                </span>
                               </button>
 
                               {isTrackExpanded &&
                                 trackSetups
                                   .sort((a, b) => a.filename.localeCompare(b.filename))
                                   .map((setup) => {
-                                    const isSelected = selectedSetup?.fullPath === setup.fullPath
+                                    const isSelected = selectedSetup?.fullPath === setup.fullPath;
                                     return (
                                       <button
                                         type="button"
                                         key={setup.fullPath}
-                                        className={`flex items-center gap-1.5 w-full pl-12 pr-3 py-1.5 text-left text-xs transition-colors ${isSelected
-                                          ? "bg-red-accent/10 text-red-accent"
-                                          : "hover:bg-accent/50 text-foreground"
-                                          }`}
+                                        className={`flex items-center gap-1.5 w-full pl-12 pr-3 py-1.5 text-left text-xs transition-colors ${
+                                          isSelected
+                                            ? "bg-red-accent/10 text-red-accent"
+                                            : "hover:bg-accent/50 text-foreground"
+                                        }`}
                                         onClick={() => selectSetup(setup)}
                                       >
                                         <FileJson
-                                          className={`w-3.5 h-3.5 shrink-0 ${isSelected ? "text-red-accent" : "text-muted-foreground"
-                                            }`}
+                                          className={`w-3.5 h-3.5 shrink-0 ${
+                                            isSelected ? "text-red-accent" : "text-muted-foreground"
+                                          }`}
                                         />
                                         <span className="truncate">{setup.filename}</span>
                                       </button>
-                                    )
+                                    );
                                   })}
                             </div>
-                          )
+                          );
                         })}
                   </div>
-                )
+                );
               })}
             </div>
           )}
@@ -472,7 +488,9 @@ function SetupPage() {
                 {/* Header row */}
                 <div className="flex items-start justify-between gap-4 px-5 py-4">
                   <div className="min-w-0 space-y-1">
-                    <div className="text-lg font-bold truncate">{selectedSetup.filename.replace(/\.json$/i, "")}</div>
+                    <div className="text-lg font-bold truncate">
+                      {selectedSetup.filename.replace(/\.json$/i, "")}
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       {carInfo && (
                         <span className="bg-secondary px-2 py-0.5 rounded-md font-medium text-foreground">
@@ -489,8 +507,8 @@ function SetupPage() {
                           variant="ghost"
                           size="icon-sm"
                           onClick={() => {
-                            setNewName(selectedSetup.filename.replace(/\.json$/, ""))
-                            setIsRenameOpen(true)
+                            setNewName(selectedSetup.filename.replace(/\.json$/, ""));
+                            setIsRenameOpen(true);
                           }}
                         >
                           <Pencil className="w-3.5 h-3.5" />
@@ -500,7 +518,11 @@ function SetupPage() {
                     </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon-sm" onClick={() => setIsDeleteOpen(true)}>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => setIsDeleteOpen(true)}
+                        >
                           <Trash2 className="w-3.5 h-3.5" />
                         </Button>
                       </TooltipTrigger>
@@ -523,7 +545,11 @@ function SetupPage() {
                     <QuickCard
                       icon={<Fuel className="w-4 h-4" />}
                       label="Fuel"
-                      value={parsedSetup.basicSetup?.strategy?.fuel != null ? `${parsedSetup.basicSetup.strategy.fuel}L` : "—"}
+                      value={
+                        parsedSetup.basicSetup?.strategy?.fuel != null
+                          ? `${parsedSetup.basicSetup.strategy.fuel}L`
+                          : "—"
+                      }
                     />
                     <QuickCard
                       icon={<Shield className="w-4 h-4" />}
@@ -579,7 +605,7 @@ function SetupPage() {
             placeholder="Setup name"
             className="h-10 bg-input border-border"
             onKeyDown={(e) => {
-              if (e.key === "Enter") handleRename()
+              if (e.key === "Enter") handleRename();
             }}
           />
           <DialogFooter>
@@ -631,7 +657,9 @@ function SetupPage() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-red-accent/10 text-red-accent ring-1 ring-red-accent/20">
                     <FileUp className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">From File</h3>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                    From File
+                  </h3>
                   <Button
                     type="button"
                     variant="outline"
@@ -647,7 +675,9 @@ function SetupPage() {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground ring-1 ring-border">
                     <Hash className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">By Code</h3>
+                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-4">
+                    By Code
+                  </h3>
                   <div className="w-full max-w-[160px] space-y-3">
                     <Input
                       inputMode="numeric"
@@ -662,7 +692,9 @@ function SetupPage() {
                       size="sm"
                       className="w-full text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100 disabled:opacity-20"
                       disabled={importCode.length !== 4}
-                      onClick={() => toast.info("Code import will be wired in when sharing is implemented.")}
+                      onClick={() =>
+                        toast.info("Code import will be wired in when sharing is implemented.")
+                      }
                     >
                       Continue
                     </Button>
@@ -671,7 +703,12 @@ function SetupPage() {
               </div>
 
               <div className="p-4 border-t border-border flex justify-end">
-                <Button variant="ghost" size="sm" onClick={() => handleImportDialogChange(false)} className="font-medium text-muted-foreground">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleImportDialogChange(false)}
+                  className="font-medium text-muted-foreground"
+                >
                   Cancel
                 </Button>
               </div>
@@ -692,7 +729,9 @@ function SetupPage() {
               <div className="px-6 py-4 space-y-4 bg-muted/30">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Setup Name</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      Setup Name
+                    </label>
                     <Input
                       id="import-setup-name"
                       value={importSetupName}
@@ -703,7 +742,9 @@ function SetupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Search Tracks</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                      Search Tracks
+                    </label>
                     <div className="relative group">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground transition-colors group-focus-within:text-red-accent" />
                       <Input
@@ -720,9 +761,13 @@ function SetupPage() {
               <ScrollArea className="flex-1 px-4 py-2">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 py-2">
                   {sortedTracks
-                    .filter(t => t.prettyName.toLowerCase().includes(trackSearch.toLowerCase()) || t.id.toLowerCase().includes(trackSearch.toLowerCase()))
+                    .filter(
+                      (t) =>
+                        t.prettyName.toLowerCase().includes(trackSearch.toLowerCase()) ||
+                        t.id.toLowerCase().includes(trackSearch.toLowerCase()),
+                    )
                     .map((track) => {
-                      const isSelected = selectedTrack === track.id
+                      const isSelected = selectedTrack === track.id;
                       return (
                         <button
                           type="button"
@@ -734,17 +779,23 @@ function SetupPage() {
                               : "hover:bg-accent text-foreground/80 hover:text-foreground"
                           }`}
                         >
-                          <div className={`p-1.5 rounded-md ${
-                            isSelected ? "bg-red-accent/20" : "bg-muted text-muted-foreground"
-                          }`}>
+                          <div
+                            className={`p-1.5 rounded-md ${
+                              isSelected ? "bg-red-accent/20" : "bg-muted text-muted-foreground"
+                            }`}
+                          >
                             <MapPinned className="h-3.5 w-3.5" />
                           </div>
                           <div className="flex-1 min-w-0">
-                            <div className="text-[12px] font-semibold truncate leading-tight">{track.prettyName}</div>
-                            <div className="text-[9px] font-medium tracking-tight opacity-50 truncate">{track.id}</div>
+                            <div className="text-[12px] font-semibold truncate leading-tight">
+                              {track.prettyName}
+                            </div>
+                            <div className="text-[9px] font-medium tracking-tight opacity-50 truncate">
+                              {track.id}
+                            </div>
                           </div>
                         </button>
-                      )
+                      );
                     })}
                 </div>
               </ScrollArea>
@@ -760,8 +811,12 @@ function SetupPage() {
                 </Button>
                 <div className="flex items-center gap-3">
                   <div className="hidden sm:block text-right">
-                    <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">Files will be saved to</div>
-                    <div className="text-[10px] font-medium text-foreground">{selectedTrack || "..."}</div>
+                    <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                      Files will be saved to
+                    </div>
+                    <div className="text-[10px] font-medium text-foreground">
+                      {selectedTrack || "..."}
+                    </div>
                   </div>
                   <Button
                     size="sm"
@@ -778,7 +833,7 @@ function SetupPage() {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
 
 function QuickCard({
@@ -787,20 +842,22 @@ function QuickCard({
   value,
   border,
 }: {
-  icon?: React.ReactNode
-  label: string
-  value: string
-  border?: boolean
+  icon?: React.ReactNode;
+  label: string;
+  value: string;
+  border?: boolean;
 }) {
   return (
     <div className={`flex items-center gap-3 px-4 py-3 ${border ? "border-l border-border" : ""}`}>
       {icon && <div className="text-muted-foreground">{icon}</div>}
       <div className="min-w-0">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{label}</div>
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+          {label}
+        </div>
         <div className="text-lg font-bold tabular-nums leading-tight">{value}</div>
       </div>
     </div>
-  )
+  );
 }
 
 /* ── Collapsible JSON tree ─────────────────────────────────── */
@@ -810,7 +867,7 @@ function JsonTree({ data }: { data: unknown }) {
     <div className="font-mono text-[11px] leading-[1.6] select-text">
       <JsonNode value={data} depth={0} defaultOpen />
     </div>
-  )
+  );
 }
 
 function JsonNode({
@@ -819,12 +876,12 @@ function JsonNode({
   depth,
   defaultOpen = false,
 }: {
-  label?: string
-  value: unknown
-  depth: number
-  defaultOpen?: boolean
+  label?: string;
+  value: unknown;
+  depth: number;
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(defaultOpen)
+  const [open, setOpen] = useState(defaultOpen);
 
   if (value === null) {
     return (
@@ -832,11 +889,11 @@ function JsonNode({
         {label && <span className="text-red-400">{label}:</span>}
         <span className="text-muted-foreground italic">null</span>
       </div>
-    )
+    );
   }
 
   if (Array.isArray(value)) {
-    const count = value.length
+    const count = value.length;
     return (
       <div>
         <button
@@ -858,12 +915,12 @@ function JsonNode({
             <JsonNode key={i} label={`${i}`} value={item} depth={depth + 1} />
           ))}
       </div>
-    )
+    );
   }
 
   if (typeof value === "object") {
-    const entries = Object.entries(value as Record<string, unknown>)
-    const count = entries.length
+    const entries = Object.entries(value as Record<string, unknown>);
+    const count = entries.length;
     return (
       <div>
         <button
@@ -881,11 +938,9 @@ function JsonNode({
           <span className="text-muted-foreground ml-1">{`{${count}}`}</span>
         </button>
         {open &&
-          entries.map(([k, v]) => (
-            <JsonNode key={k} label={k} value={v} depth={depth + 1} />
-          ))}
+          entries.map(([k, v]) => <JsonNode key={k} label={k} value={v} depth={depth + 1} />)}
       </div>
-    )
+    );
   }
 
   // Primitive values
@@ -894,18 +949,16 @@ function JsonNode({
       ? "text-sky-400"
       : typeof value === "boolean"
         ? "text-amber-400"
-        : "text-green-400"
+        : "text-green-400";
 
   return (
     <div style={{ paddingLeft: depth * 16 }} className="flex items-baseline gap-1.5 py-px">
       {label && <span className="text-red-400">{label}:</span>}
-      <span className={colorClass}>
-        {typeof value === "string" ? `"${value}"` : String(value)}
-      </span>
+      <span className={colorClass}>{typeof value === "string" ? `"${value}"` : String(value)}</span>
     </div>
-  )
+  );
 }
 
 export default function AccSetupRoute() {
-  return <SetupPage />
+  return <SetupPage />;
 }

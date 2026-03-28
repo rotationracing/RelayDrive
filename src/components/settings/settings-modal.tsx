@@ -1,32 +1,43 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { HotkeyInput, HotkeyValue, formatHotkey, parseHotkey } from "@/components/ui/hotkey-input"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { MeasurementUnitsModal } from "@/components/settings/MeasurementUnitsModal"
-import { useSettingsContext } from "@/contexts/SettingsContext"
-import { useSettingsModal } from "@/contexts/SettingsModalContext"
-import { setLocale, useI18n } from "@/i18n"
-import { LANGUAGE_OPTIONS } from "@/lib/language"
-import type { LanguageCode } from "@/lib/language"
-import { CHOICE_IMPERIAL, CHOICE_METRIC, type UnitsMode, inferUnitsModeFromChoice } from "@/lib/units"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useEffect, useState } from "react"
-import type { ConnectionDetails, GameConnectionSettings } from "@/app/tauri-bridge"
+} from "@/components/ui/dialog";
+import { HotkeyInput, HotkeyValue, formatHotkey, parseHotkey } from "@/components/ui/hotkey-input";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { MeasurementUnitsModal } from "@/components/settings/MeasurementUnitsModal";
+import { useSettingsContext } from "@/contexts/SettingsContext";
+import { useSettingsModal } from "@/contexts/SettingsModalContext";
+import { setLocale, useI18n } from "@/i18n";
+import { LANGUAGE_OPTIONS } from "@/lib/language";
+import type { LanguageCode } from "@/lib/language";
+import {
+  CHOICE_IMPERIAL,
+  CHOICE_METRIC,
+  type UnitsMode,
+  inferUnitsModeFromChoice,
+} from "@/lib/units";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect, useState } from "react";
+import type { ConnectionDetails, GameConnectionSettings } from "@/app/tauri-bridge";
 
-type GameConnectionKey = keyof GameConnectionSettings
+type GameConnectionKey = keyof GameConnectionSettings;
 
-const CONNECTION_GAME_KEYS: GameConnectionKey[] = ["acc", "iracing", "lmu"]
+const CONNECTION_GAME_KEYS: GameConnectionKey[] = ["acc", "iracing", "lmu"];
 
 const DEFAULT_CONNECTION_SETTINGS: GameConnectionSettings = {
   acc: {
@@ -47,28 +58,28 @@ const DEFAULT_CONNECTION_SETTINGS: GameConnectionSettings = {
     connectionPassword: "",
     commandPassword: "",
   },
-}
+};
 
 export function SettingsModal() {
-  const { open, setOpen } = useSettingsModal()
-  const { t } = useI18n()
-  const { settings: globalSettings, persist } = useSettingsContext()
-  
+  const { open, setOpen } = useSettingsModal();
+  const { t } = useI18n();
+  const { settings: globalSettings, persist } = useSettingsContext();
+
   const [settings, setSettings] = useState<{
-    checkForUpdates: boolean
-    language: string
-    measurement_units: typeof CHOICE_METRIC
-    hotkeys: Record<string, string | null>
-    connectionSettings: GameConnectionSettings
-  } | null>(null)
-  const [unitsMode, setUnitsMode] = useState<UnitsMode>("metric")
-  const [unitsModalOpen, setUnitsModalOpen] = useState(false)
-  const [activeConnectionTab, setActiveConnectionTab] = useState<GameConnectionKey>("acc")
+    checkForUpdates: boolean;
+    language: string;
+    measurement_units: typeof CHOICE_METRIC;
+    hotkeys: Record<string, string | null>;
+    connectionSettings: GameConnectionSettings;
+  } | null>(null);
+  const [unitsMode, setUnitsMode] = useState<UnitsMode>("metric");
+  const [unitsModalOpen, setUnitsModalOpen] = useState(false);
+  const [activeConnectionTab, setActiveConnectionTab] = useState<GameConnectionKey>("acc");
 
   // Sync local editable state from global when modal opens or settings change
   useEffect(() => {
-    if (!open || !globalSettings) return
-    
+    if (!open || !globalSettings) return;
+
     const loaded = {
       checkForUpdates: globalSettings.checkForUpdates ?? true,
       language: globalSettings.language || "en",
@@ -79,162 +90,162 @@ export function SettingsModal() {
         ...(globalSettings.hotkeys || {}),
       },
       connectionSettings: globalSettings.connectionSettings ?? DEFAULT_CONNECTION_SETTINGS,
-    }
-    setSettings(loaded)
-    setUnitsMode(inferUnitsModeFromChoice(loaded.measurement_units))
-  }, [open, globalSettings])
+    };
+    setSettings(loaded);
+    setUnitsMode(inferUnitsModeFromChoice(loaded.measurement_units));
+  }, [open, globalSettings]);
 
   const handleLanguageChange = async (value: string) => {
-    if (!settings) return
+    if (!settings) return;
     // Update state immediately
-    const updated = { ...settings, language: value }
-    setSettings(updated)
+    const updated = { ...settings, language: value };
+    setSettings(updated);
     // Switch i18n locale instantly
-    await setLocale(value as LanguageCode)
+    await setLocale(value as LanguageCode);
     // Persist to backend
     try {
       await persist({
         ...globalSettings!,
         language: value,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save language setting:", error)
+      console.error("Failed to save language setting:", error);
     }
-  }
+  };
 
   const handleUnitsModeChange = async (mode: UnitsMode) => {
-    if (!settings) return
-    
-    let newChoice: typeof CHOICE_METRIC
+    if (!settings) return;
+
+    let newChoice: typeof CHOICE_METRIC;
     if (mode === "custom") {
-      setUnitsModalOpen(true)
-      return
+      setUnitsModalOpen(true);
+      return;
     } else if (mode === "imperial") {
-      newChoice = CHOICE_IMPERIAL
+      newChoice = CHOICE_IMPERIAL;
     } else {
-      newChoice = CHOICE_METRIC
+      newChoice = CHOICE_METRIC;
     }
-    
-    const updated = { ...settings, measurement_units: newChoice }
-    setSettings(updated)
-    setUnitsMode(mode)
-    
+
+    const updated = { ...settings, measurement_units: newChoice };
+    setSettings(updated);
+    setUnitsMode(mode);
+
     // Persist to backend
     try {
       await persist({
         ...globalSettings!,
         measurement_units: newChoice,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save units setting:", error)
+      console.error("Failed to save units setting:", error);
     }
-  }
+  };
 
   const handleCustomUnitsSave = async (choice: typeof CHOICE_METRIC) => {
-    if (!settings) return
-    
-    const updated = { ...settings, measurement_units: choice }
-    setSettings(updated)
-    setUnitsMode("custom")
-    
+    if (!settings) return;
+
+    const updated = { ...settings, measurement_units: choice };
+    setSettings(updated);
+    setUnitsMode("custom");
+
     // Persist to backend
     try {
       await persist({
         ...globalSettings!,
         measurement_units: choice,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save custom units setting:", error)
+      console.error("Failed to save custom units setting:", error);
     }
-  }
+  };
 
   const handleCheckForUpdatesChange = async (checked: boolean) => {
-    if (!settings) return
-    
-    const updated = { ...settings, checkForUpdates: checked }
-    setSettings(updated)
-    
+    if (!settings) return;
+
+    const updated = { ...settings, checkForUpdates: checked };
+    setSettings(updated);
+
     // Persist to backend
     try {
       await persist({
         ...globalSettings!,
         checkForUpdates: checked,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save check for updates setting:", error)
+      console.error("Failed to save check for updates setting:", error);
     }
-  }
+  };
 
   const handleHotkeyChange = async (hotkeyId: string, value: HotkeyValue | null) => {
-    if (!settings) return
-    
-    const hotkeyString = value ? formatHotkey(value) : null
+    if (!settings) return;
+
+    const hotkeyString = value ? formatHotkey(value) : null;
     const updated = {
       ...settings,
       hotkeys: {
         ...settings.hotkeys,
         [hotkeyId]: hotkeyString,
       },
-    }
-    setSettings(updated)
-    
+    };
+    setSettings(updated);
+
     // Persist to backend
     try {
       await persist({
         ...globalSettings!,
         hotkeys: updated.hotkeys,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save hotkey setting:", error)
+      console.error("Failed to save hotkey setting:", error);
     }
-  }
+  };
 
   const handleConnectionSettingChange = async (
     game: GameConnectionKey,
     field: keyof ConnectionDetails,
-    value: string
+    value: string,
   ) => {
-    if (!settings || !globalSettings) return
+    if (!settings || !globalSettings) return;
 
-    const currentGameSettings = settings.connectionSettings[game]
-    let updatedGameSettings: ConnectionDetails
+    const currentGameSettings = settings.connectionSettings[game];
+    let updatedGameSettings: ConnectionDetails;
 
     if (field === "port") {
-      const portValue = Math.min(65535, Math.max(0, Number(value) || 0))
-      updatedGameSettings = { ...currentGameSettings, port: portValue }
+      const portValue = Math.min(65535, Math.max(0, Number(value) || 0));
+      updatedGameSettings = { ...currentGameSettings, port: portValue };
     } else if (field === "host") {
-      updatedGameSettings = { ...currentGameSettings, host: value }
+      updatedGameSettings = { ...currentGameSettings, host: value };
     } else if (field === "connectionPassword") {
-      updatedGameSettings = { ...currentGameSettings, connectionPassword: value }
+      updatedGameSettings = { ...currentGameSettings, connectionPassword: value };
     } else {
-      updatedGameSettings = { ...currentGameSettings, commandPassword: value }
+      updatedGameSettings = { ...currentGameSettings, commandPassword: value };
     }
 
     const updatedConnectionSettings = {
       ...settings.connectionSettings,
       [game]: updatedGameSettings,
-    }
-    const updated = { ...settings, connectionSettings: updatedConnectionSettings }
-    setSettings(updated)
+    };
+    const updated = { ...settings, connectionSettings: updatedConnectionSettings };
+    setSettings(updated);
 
     try {
       await persist({
         ...globalSettings,
         connectionSettings: updatedConnectionSettings,
-      })
+      });
     } catch (error) {
-      console.error("Failed to save connection setting:", error)
+      console.error("Failed to save connection setting:", error);
     }
-  }
+  };
 
   if (!settings) {
-    return null
+    return null;
   }
 
   return (
     <>
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent 
+        <DialogContent
           className="sm:max-w-2xl max-h-[90vh] overflow-y-auto"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
@@ -242,7 +253,7 @@ export function SettingsModal() {
             <DialogTitle className="text-2xl font-bold">Settings</DialogTitle>
             <DialogDescription>Manage your application preferences</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-6 mt-4">
             <Card className="rounded-[var(--radius-xl)]">
               <CardHeader className="pb-2">
@@ -268,8 +279,10 @@ export function SettingsModal() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {LANGUAGE_OPTIONS.map(opt => (
-                          <SelectItem key={opt.code} value={opt.code}>{opt.label}</SelectItem>
+                        {LANGUAGE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.code} value={opt.code}>
+                            {opt.label}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -286,8 +299,8 @@ export function SettingsModal() {
                     <button
                       type="button"
                       className={`px-3 py-1.5 text-xs transition-colors ${
-                        unitsMode === "custom" 
-                          ? "bg-accent text-accent-foreground" 
+                        unitsMode === "custom"
+                          ? "bg-accent text-accent-foreground"
                           : "bg-transparent text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => handleUnitsModeChange("custom")}
@@ -297,8 +310,8 @@ export function SettingsModal() {
                     <button
                       type="button"
                       className={`px-3 py-1.5 text-xs transition-colors ${
-                        unitsMode === "imperial" 
-                          ? "bg-accent text-accent-foreground" 
+                        unitsMode === "imperial"
+                          ? "bg-accent text-accent-foreground"
                           : "bg-transparent text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => handleUnitsModeChange("imperial")}
@@ -308,8 +321,8 @@ export function SettingsModal() {
                     <button
                       type="button"
                       className={`px-3 py-1.5 text-xs transition-colors ${
-                        unitsMode === "metric" 
-                          ? "bg-accent text-accent-foreground" 
+                        unitsMode === "metric"
+                          ? "bg-accent text-accent-foreground"
                           : "bg-transparent text-muted-foreground hover:text-foreground"
                       }`}
                       onClick={() => handleUnitsModeChange("metric")}
@@ -323,7 +336,9 @@ export function SettingsModal() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-sm font-medium">{t("common.check_for_updates")}</Label>
-                    <p className="text-xs text-muted-foreground">{t("common.check_for_updates_desc")}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t("common.check_for_updates_desc")}
+                    </p>
                   </div>
                   <div className="shrink-0 ml-4">
                     <Switch
@@ -352,11 +367,17 @@ export function SettingsModal() {
                 <div className="flex items-center justify-between">
                   <div className="space-y-1 flex-1 min-w-0">
                     <Label className="text-sm font-medium">Toggle Overlay Edit Mode</Label>
-                    <p className="text-xs text-muted-foreground">Enable or disable overlay edit mode</p>
+                    <p className="text-xs text-muted-foreground">
+                      Enable or disable overlay edit mode
+                    </p>
                   </div>
                   <div className="shrink-0 ml-4 w-64">
                     <HotkeyInput
-                      value={settings.hotkeys.toggle_overlay_edit_mode ? parseHotkey(settings.hotkeys.toggle_overlay_edit_mode) : null}
+                      value={
+                        settings.hotkeys.toggle_overlay_edit_mode
+                          ? parseHotkey(settings.hotkeys.toggle_overlay_edit_mode)
+                          : null
+                      }
                       onChange={(value) => handleHotkeyChange("toggle_overlay_edit_mode", value)}
                     />
                   </div>
@@ -370,7 +391,11 @@ export function SettingsModal() {
                   </div>
                   <div className="shrink-0 ml-4 w-64">
                     <HotkeyInput
-                      value={settings.hotkeys.toggle_overlays_enabled ? parseHotkey(settings.hotkeys.toggle_overlays_enabled) : null}
+                      value={
+                        settings.hotkeys.toggle_overlays_enabled
+                          ? parseHotkey(settings.hotkeys.toggle_overlays_enabled)
+                          : null
+                      }
                       onChange={(value) => handleHotkeyChange("toggle_overlays_enabled", value)}
                     />
                   </div>
@@ -402,7 +427,7 @@ export function SettingsModal() {
                     ))}
                   </TabsList>
                   {CONNECTION_GAME_KEYS.map((game) => {
-                    const current = settings.connectionSettings[game]
+                    const current = settings.connectionSettings[game];
                     return (
                       <TabsContent
                         key={game}
@@ -441,7 +466,11 @@ export function SettingsModal() {
                           <Input
                             value={current.connectionPassword}
                             onChange={(event) =>
-                              handleConnectionSettingChange(game, "connectionPassword", event.target.value)
+                              handleConnectionSettingChange(
+                                game,
+                                "connectionPassword",
+                                event.target.value,
+                              )
                             }
                             placeholder="asd"
                             autoComplete="off"
@@ -454,13 +483,17 @@ export function SettingsModal() {
                           <Input
                             value={current.commandPassword}
                             onChange={(event) =>
-                              handleConnectionSettingChange(game, "commandPassword", event.target.value)
+                              handleConnectionSettingChange(
+                                game,
+                                "commandPassword",
+                                event.target.value,
+                              )
                             }
                             autoComplete="off"
                           />
                         </div>
                       </TabsContent>
-                    )
+                    );
                   })}
                 </Tabs>
               </CardContent>
@@ -476,6 +509,5 @@ export function SettingsModal() {
         onSave={handleCustomUnitsSave}
       />
     </>
-  )
+  );
 }
-

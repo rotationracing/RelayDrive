@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { type UnlistenFn, listen } from "@tauri-apps/api/event"
+import { type UnlistenFn, listen } from "@tauri-apps/api/event";
 import {
   type ReactNode,
   createContext,
@@ -9,146 +9,146 @@ import {
   useMemo,
   useRef,
   useState,
-} from "react"
+} from "react";
 
-import { useProcess } from "./ProcessContext"
+import { useProcess } from "./ProcessContext";
 
-const GRAPHICS_EVENT = "acc://graphics"
+const GRAPHICS_EVENT = "acc://graphics";
 
-export type GraphicsStatus = "ok" | "waiting" | "error"
+export type GraphicsStatus = "ok" | "waiting" | "error";
 
 export interface GraphicsMap {
-  packet_id?: number
-  status?: number
-  session_type?: number
-  current_time?: number
-  last_time?: number
-  best_time?: number
-  position?: number
-  completed_lap?: number
-  [key: string]: unknown
+  packet_id?: number;
+  status?: number;
+  session_type?: number;
+  current_time?: number;
+  last_time?: number;
+  best_time?: number;
+  position?: number;
+  completed_lap?: number;
+  [key: string]: unknown;
 }
 
 interface GraphicsEventPayload {
-  timestamp?: number | string
-  status?: GraphicsStatus | string
-  data?: GraphicsMap | null
-  message?: string | null
+  timestamp?: number | string;
+  status?: GraphicsStatus | string;
+  data?: GraphicsMap | null;
+  message?: string | null;
 }
 
 export interface GraphicsFrame {
-  timestamp: number
-  status: GraphicsStatus
-  data: GraphicsMap | null
-  message: string | null
+  timestamp: number;
+  status: GraphicsStatus;
+  data: GraphicsMap | null;
+  message: string | null;
 }
 
 interface GraphicsContextValue {
-  frame: GraphicsFrame | null
-  lastOkFrame: GraphicsFrame | null
-  status: GraphicsStatus
+  frame: GraphicsFrame | null;
+  lastOkFrame: GraphicsFrame | null;
+  status: GraphicsStatus;
 }
 
-const AccGraphicsContext = createContext<GraphicsContextValue | undefined>(undefined)
+const AccGraphicsContext = createContext<GraphicsContextValue | undefined>(undefined);
 
 export function AccGraphicsProvider({ children }: { children: ReactNode }) {
-  const { isRunning } = useProcess()
+  const { isRunning } = useProcess();
 
-  const [frame, setFrame] = useState<GraphicsFrame | null>(null)
-  const [lastOkFrame, setLastOkFrame] = useState<GraphicsFrame | null>(null)
-  const [status, setStatus] = useState<GraphicsStatus>("waiting")
+  const [frame, setFrame] = useState<GraphicsFrame | null>(null);
+  const [lastOkFrame, setLastOkFrame] = useState<GraphicsFrame | null>(null);
+  const [status, setStatus] = useState<GraphicsStatus>("waiting");
 
-  const latestRef = useRef<GraphicsFrame | null>(null)
-  const rafRef = useRef<number | null>(null)
-  const mountedRef = useRef(true)
-  const runningRef = useRef(isRunning)
+  const latestRef = useRef<GraphicsFrame | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const mountedRef = useRef(true);
+  const runningRef = useRef(isRunning);
 
   useEffect(() => {
-    runningRef.current = isRunning
+    runningRef.current = isRunning;
     if (!isRunning) {
-      latestRef.current = null
-      setFrame(null)
-      setLastOkFrame(null)
-      setStatus("waiting")
+      latestRef.current = null;
+      setFrame(null);
+      setLastOkFrame(null);
+      setStatus("waiting");
     }
-  }, [isRunning])
+  }, [isRunning]);
 
   useEffect(() => {
-    mountedRef.current = true
-    let unlisten: UnlistenFn | null = null
+    mountedRef.current = true;
+    let unlisten: UnlistenFn | null = null;
 
     const commitLatest = () => {
-      const next = latestRef.current
-      setFrame(next)
-      setStatus(next?.status ?? "waiting")
+      const next = latestRef.current;
+      setFrame(next);
+      setStatus(next?.status ?? "waiting");
       if (next?.status === "ok") {
-        setLastOkFrame(next)
+        setLastOkFrame(next);
       }
-    }
+    };
 
     const scheduleCommit = () => {
       if (!mountedRef.current) {
-        return
+        return;
       }
 
       if (typeof window === "undefined") {
-        commitLatest()
-        return
+        commitLatest();
+        return;
       }
 
       if (rafRef.current !== null) {
-        return
+        return;
       }
 
       rafRef.current = window.requestAnimationFrame(() => {
-        rafRef.current = null
+        rafRef.current = null;
         if (!mountedRef.current) {
-          return
+          return;
         }
-        commitLatest()
-      })
-    }
+        commitLatest();
+      });
+    };
 
     const setup = async () => {
       try {
         unlisten = await listen<GraphicsEventPayload>(GRAPHICS_EVENT, (event) => {
           if (!mountedRef.current) {
-            return
+            return;
           }
 
-          const normalized = normalizeGraphicsPayload(event.payload)
+          const normalized = normalizeGraphicsPayload(event.payload);
 
           if (!normalized) {
-            latestRef.current = null
-            scheduleCommit()
-            return
+            latestRef.current = null;
+            scheduleCommit();
+            return;
           }
 
           if (!runningRef.current && normalized.status === "ok") {
-            return
+            return;
           }
 
-          latestRef.current = normalized
-          scheduleCommit()
-        })
+          latestRef.current = normalized;
+          scheduleCommit();
+        });
       } catch (error) {
-        console.warn("Failed to subscribe to ACC graphics events", error)
+        console.warn("Failed to subscribe to ACC graphics events", error);
       }
-    }
+    };
 
-    void setup()
+    void setup();
 
     return () => {
-      mountedRef.current = false
+      mountedRef.current = false;
       if (unlisten) {
-        unlisten()
+        unlisten();
       }
       if (typeof window !== "undefined" && rafRef.current !== null) {
-        window.cancelAnimationFrame(rafRef.current)
-        rafRef.current = null
+        window.cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -157,42 +157,45 @@ export function AccGraphicsProvider({ children }: { children: ReactNode }) {
       status,
     }),
     [frame, lastOkFrame, status],
-  )
+  );
 
-  return <AccGraphicsContext.Provider value={value}>{children}</AccGraphicsContext.Provider>
+  return <AccGraphicsContext.Provider value={value}>{children}</AccGraphicsContext.Provider>;
 }
 
 export function useAccGraphics(): GraphicsContextValue {
-  const context = useContext(AccGraphicsContext)
+  const context = useContext(AccGraphicsContext);
   if (!context) {
-    throw new Error("useAccGraphics must be used within an AccGraphicsProvider")
+    throw new Error("useAccGraphics must be used within an AccGraphicsProvider");
   }
-  return context
+  return context;
 }
 
-function normalizeGraphicsPayload(payload: GraphicsEventPayload | null | undefined): GraphicsFrame | null {
+function normalizeGraphicsPayload(
+  payload: GraphicsEventPayload | null | undefined,
+): GraphicsFrame | null {
   if (!payload) {
-    return null
+    return null;
   }
 
   const timestampValue =
-    typeof payload.timestamp === "string" ? Number(payload.timestamp) : payload.timestamp
-  const timestamp = Number.isFinite(timestampValue) && timestampValue !== null
-    ? Number(timestampValue)
-    : Date.now()
+    typeof payload.timestamp === "string" ? Number(payload.timestamp) : payload.timestamp;
+  const timestamp =
+    Number.isFinite(timestampValue) && timestampValue !== null
+      ? Number(timestampValue)
+      : Date.now();
 
-  const status: GraphicsStatus = isGraphicsStatus(payload.status) ? payload.status : "waiting"
-  const data = payload.data && typeof payload.data === "object" ? payload.data : null
-  const message = payload.message ?? null
+  const status: GraphicsStatus = isGraphicsStatus(payload.status) ? payload.status : "waiting";
+  const data = payload.data && typeof payload.data === "object" ? payload.data : null;
+  const message = payload.message ?? null;
 
   return {
     timestamp,
     status,
     data,
     message,
-  }
+  };
 }
 
 function isGraphicsStatus(value: unknown): value is GraphicsStatus {
-  return value === "ok" || value === "waiting" || value === "error"
+  return value === "ok" || value === "waiting" || value === "error";
 }

@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { useAppBootstrap } from "@/contexts/AppBootstrapContext"
-import Link from "next/link"
-import { useEffect } from "react"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAppBootstrap } from "@/contexts/AppBootstrapContext";
+import Link from "next/link";
+import { useEffect } from "react";
 
 export default function IRacingPage() {
-  const { setIsLaunching, setLaunchingLabel } = useAppBootstrap()
+  const { setIsLaunching, setLaunchingLabel } = useAppBootstrap();
 
   useEffect(() => {
-    setIsLaunching(false)
-    setLaunchingLabel(null)
-  }, [setIsLaunching, setLaunchingLabel])
+    setIsLaunching(false);
+    setLaunchingLabel(null);
+  }, [setIsLaunching, setLaunchingLabel]);
 
   return (
     <div className="h-full">
@@ -26,12 +26,13 @@ export default function IRacingPage() {
           <CardHeader>
             <CardTitle>iRacing UI</CardTitle>
             <CardDescription>
-              This is a placeholder for the iRacing-specific UI. Build out pages and components under
+              This is a placeholder for the iRacing-specific UI. Build out pages and components
+              under
               <code className="ml-1">src/components/</code> and this route.
             </CardDescription>
           </CardHeader>
         </Card>
       </div>
     </div>
-  )
+  );
 }

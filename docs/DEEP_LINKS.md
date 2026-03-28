@@ -65,7 +65,7 @@ Simply navigate to a deep link URL:
 ### From JavaScript
 
 ```javascript
-window.location.href = 'relaydrive://acc/engineer';
+window.location.href = "relaydrive://acc/engineer";
 ```
 
 ### From Command Line (Windows)

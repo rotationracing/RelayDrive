@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Thermometer } from "lucide-react"
-import type { OverlayModule } from "../types"
+import { Thermometer } from "lucide-react";
+import type { OverlayModule } from "../types";
 
 const TempsOverlay: OverlayModule = {
   id: "temps",
@@ -33,14 +33,15 @@ const TempsOverlay: OverlayModule = {
             </div>
             <div className="mt-1 flex items-end justify-between text-base font-semibold tabular-nums">
               <span>{tire.core}</span>
-              <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/45">Surf {tire.surface}</span>
+              <span className="text-xs font-medium uppercase tracking-[0.2em] text-white/45">
+                Surf {tire.surface}
+              </span>
             </div>
           </div>
         ))}
       </div>
     </div>
   ),
-}
+};
 
-export default TempsOverlay
-
+export default TempsOverlay;

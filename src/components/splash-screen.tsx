@@ -15,9 +15,7 @@ export function SplashScreen({ phase }: { phase: SplashPhase }) {
         className={`text-center transition-all duration-700 ${
           phase === "enter" ? "translate-y-8 opacity-0 scale-95" : ""
         } ${
-          phase === "show"
-            ? "translate-y-0 opacity-100 scale-100 animate-splash-pop"
-            : ""
+          phase === "show" ? "translate-y-0 opacity-100 scale-100 animate-splash-pop" : ""
         } ${phase === "exit" ? "opacity-0 scale-95" : ""}`}
       >
         <h1 className="text-5xl font-bold">
@@ -26,12 +24,18 @@ export function SplashScreen({ phase }: { phase: SplashPhase }) {
       </div>
       <style jsx global>{`
         @keyframes splash-pop {
-          0% { transform: scale(0.95); }
-          60% { transform: scale(1.05); }
-          100% { transform: scale(1); }
+          0% {
+            transform: scale(0.95);
+          }
+          60% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1);
+          }
         }
         .animate-splash-pop {
-          animation: splash-pop 0.6s cubic-bezier(0.4,0,0.2,1);
+          animation: splash-pop 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
       `}</style>
     </div>

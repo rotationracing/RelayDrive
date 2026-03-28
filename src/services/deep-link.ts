@@ -1,6 +1,10 @@
 "use client";
 
-import { DEEP_LINK_ALLOWED_PROTOCOLS, DEEP_LINK_PROTOCOL, DeepLinkEvents } from "@/config/constants";
+import {
+  DEEP_LINK_ALLOWED_PROTOCOLS,
+  DEEP_LINK_PROTOCOL,
+  DeepLinkEvents,
+} from "@/config/constants";
 import { type ParsedDeepLink, parseDeepLink } from "@/lib/deeplink";
 import { type UnlistenFn, listen as listenEvent } from "@tauri-apps/api/event";
 import { getCurrent, onOpenUrl } from "@tauri-apps/plugin-deep-link";
@@ -83,10 +87,14 @@ export async function initDeepLinkListener(cb: DeepLinkHandler) {
   }
 
   return () => {
-    try { unsubscribe?.(); } catch {}
+    try {
+      unsubscribe?.();
+    } catch {}
     unsubscribe = null;
     for (const off of unlistenFns) {
-      try { off(); } catch {}
+      try {
+        off();
+      } catch {}
     }
   };
 }

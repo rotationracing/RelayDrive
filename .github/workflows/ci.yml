@@ -4,18 +4,18 @@ on:
     branches:
       - main
     paths:
-      - 'src-tauri/**'
-      - 'Cargo.lock'
-      - 'package.json'
-      - 'bun.lock'
+      - "src-tauri/**"
+      - "Cargo.lock"
+      - "package.json"
+      - "bun.lock"
   pull_request:
     branches:
       - main
     paths:
-      - 'src-tauri/**'
-      - 'Cargo.lock'
-      - 'package.json'
-      - 'bun.lock'
+      - "src-tauri/**"
+      - "Cargo.lock"
+      - "package.json"
+      - "bun.lock"
   workflow_dispatch:
 
 jobs:

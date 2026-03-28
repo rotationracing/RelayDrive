@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { Switch } from "@/components/ui/switch"
-import { Monitor } from "lucide-react"
-import type { LucideIcon } from "lucide-react"
-import type { OverlayInstance } from "@/app/acc/overlay/types"
+import { Switch } from "@/components/ui/switch";
+import { Monitor } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import type { OverlayInstance } from "@/app/acc/overlay/types";
 
 interface OverlayCardItemProps {
-  overlay: OverlayInstance
-  editMode: boolean
-  onToggle: (id: string) => void
-  onOpenSettings: (id: string) => void
-  onDragStart: (id: string) => void
-  onDrop: (targetId: string) => void
+  overlay: OverlayInstance;
+  editMode: boolean;
+  onToggle: (id: string) => void;
+  onOpenSettings: (id: string) => void;
+  onDragStart: (id: string) => void;
+  onDrop: (targetId: string) => void;
 }
 
 export function OverlayCardItem({
@@ -22,7 +22,7 @@ export function OverlayCardItem({
   onDragStart,
   onDrop,
 }: OverlayCardItemProps) {
-  const Icon = (overlay.icon ?? Monitor) as LucideIcon
+  const Icon = (overlay.icon ?? Monitor) as LucideIcon;
 
   return (
     <div
@@ -32,8 +32,8 @@ export function OverlayCardItem({
       onClick={() => onOpenSettings(overlay.id)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault()
-          onOpenSettings(overlay.id)
+          event.preventDefault();
+          onOpenSettings(overlay.id);
         }
       }}
       draggable={editMode}
@@ -63,6 +63,5 @@ export function OverlayCardItem({
         </div>
       </div>
     </div>
-  )
+  );
 }
-

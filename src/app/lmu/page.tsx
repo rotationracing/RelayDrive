@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 
 export default function LMUPage() {
   return (
@@ -17,11 +17,12 @@ export default function LMUPage() {
           <CardHeader>
             <CardTitle>Le Mans Ultimate UI</CardTitle>
             <CardDescription>
-              This is a placeholder for the LMU-specific UI. Build out pages and components under this route.
+              This is a placeholder for the LMU-specific UI. Build out pages and components under
+              this route.
             </CardDescription>
           </CardHeader>
         </Card>
       </div>
     </div>
-  )
+  );
 }

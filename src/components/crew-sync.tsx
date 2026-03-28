@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,23 +10,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Crown, MoreHorizontal, Settings, UserCheck, UserPlus, Users } from "lucide-react"
-import { useEffect, useState } from "react"
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Crown, MoreHorizontal, Settings, UserCheck, UserPlus, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface CrewMember {
-  id: string
-  name: string
-  role: "driver" | "crew"
-  status: "online" | "offline" | "away"
+  id: string;
+  name: string;
+  role: "driver" | "crew";
+  status: "online" | "offline" | "away";
 }
 
 interface CrewSession {
-  id: string
-  members: CrewMember[]
-  createdBy: string
+  id: string;
+  members: CrewMember[];
+  createdBy: string;
 }
 
 // Sample names for testing
@@ -43,37 +48,37 @@ const sampleNames = [
   "Anna Garcia",
   "Ryan Lee",
   "Sophie Martin",
-]
+];
 
 export function CrewSync() {
-  const [crewSession, setCrewSession] = useState<CrewSession | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<{ name: string }>({ name: "User" })
+  const [crewSession, setCrewSession] = useState<CrewSession | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<{ name: string }>({ name: "User" });
 
   // Load current user on client only
   useEffect(() => {
     try {
-      if (typeof window !== 'undefined') {
-        const saved = localStorage.getItem("relaydrive-profile")
-        if (saved) setCurrentUser(JSON.parse(saved))
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("relaydrive-profile");
+        if (saved) setCurrentUser(JSON.parse(saved));
       }
     } catch {
       // ignore
     }
-  }, [])
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "online":
-        return "bg-vibrant-green"
+        return "bg-vibrant-green";
       case "away":
-        return "bg-yellow-500"
+        return "bg-yellow-500";
       case "offline":
-        return "bg-gray-500"
+        return "bg-gray-500";
       default:
-        return "bg-gray-500"
+        return "bg-gray-500";
     }
-  }
+  };
 
   const createCrewSession = () => {
     const newSession: CrewSession = {
@@ -87,33 +92,35 @@ export function CrewSync() {
         },
       ],
       createdBy: "current-user",
-    }
-    setCrewSession(newSession)
-  }
+    };
+    setCrewSession(newSession);
+  };
 
   const addRandomMember = () => {
-    if (!crewSession || crewSession.members.length >= 4) return
+    if (!crewSession || crewSession.members.length >= 4) return;
 
-    const availableNames = sampleNames.filter((name) => !crewSession.members.some((member) => member.name === name))
+    const availableNames = sampleNames.filter(
+      (name) => !crewSession.members.some((member) => member.name === name),
+    );
 
-    if (availableNames.length === 0) return
+    if (availableNames.length === 0) return;
 
-    const randomName = availableNames[Math.floor(Math.random() * availableNames.length)]
+    const randomName = availableNames[Math.floor(Math.random() * availableNames.length)];
     const newMember: CrewMember = {
       id: `member-${Date.now()}`,
       name: randomName,
       role: "crew",
       status: Math.random() > 0.3 ? "online" : Math.random() > 0.5 ? "away" : "offline",
-    }
+    };
 
     setCrewSession({
       ...crewSession,
       members: [...crewSession.members, newMember],
-    })
-  }
+    });
+  };
 
   const makeDriver = (memberId: string) => {
-    if (!crewSession) return
+    if (!crewSession) return;
 
     setCrewSession({
       ...crewSession,
@@ -121,22 +128,22 @@ export function CrewSync() {
         ...member,
         role: member.id === memberId ? "driver" : member.role === "driver" ? "crew" : member.role,
       })),
-    })
-  }
+    });
+  };
 
   const removeMember = (memberId: string) => {
-    if (!crewSession || memberId === "current-user") return
+    if (!crewSession || memberId === "current-user") return;
 
     setCrewSession({
       ...crewSession,
       members: crewSession.members.filter((member) => member.id !== memberId),
-    })
-  }
+    });
+  };
 
   const leaveSession = () => {
-    setCrewSession(null)
-    setIsModalOpen(false)
-  }
+    setCrewSession(null);
+    setIsModalOpen(false);
+  };
 
   if (!crewSession) {
     return (
@@ -152,12 +159,12 @@ export function CrewSync() {
           </div>
         </div>
       </TooltipProvider>
-    )
+    );
   }
 
-  const onlineMembers = crewSession.members.filter((m) => m.status === "online")
-  const totalMembers = crewSession.members.length
-  const canAddMembers = crewSession.members.length < 4
+  const onlineMembers = crewSession.members.filter((m) => m.status === "online");
+  const totalMembers = crewSession.members.length;
+  const canAddMembers = crewSession.members.length < 4;
 
   return (
     <TooltipProvider>
@@ -190,7 +197,10 @@ export function CrewSync() {
                 <div className="space-y-3">
                   <h4 className="text-sm font-medium">Members ({crewSession.members.length}/4)</h4>
                   {crewSession.members.map((member) => (
-                    <div key={member.id} className="flex items-center justify-between p-3 border rounded-app">
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-3 border rounded-app"
+                    >
                       <div className="flex items-center space-x-3">
                         <div className="relative">
                           <Avatar className="w-8 h-8">
@@ -205,16 +215,24 @@ export function CrewSync() {
                         <div>
                           <div className="flex items-center space-x-2">
                             <span className="text-sm font-medium">{member.name}</span>
-                            {member.role === "driver" && <Crown className="w-3 h-3 text-yellow-500" />}
+                            {member.role === "driver" && (
+                              <Crown className="w-3 h-3 text-yellow-500" />
+                            )}
                           </div>
-                          <div className="text-xs text-muted-foreground capitalize">{member.role}</div>
+                          <div className="text-xs text-muted-foreground capitalize">
+                            {member.role}
+                          </div>
                         </div>
                       </div>
 
                       {member.id !== "current-user" && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="rounded-app-sm p-1 h-6 w-6">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="rounded-app-sm p-1 h-6 w-6"
+                            >
                               <MoreHorizontal className="w-3 h-3" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -250,7 +268,11 @@ export function CrewSync() {
                     <UserPlus className="w-4 h-4 mr-2" />
                     Invite {!canAddMembers && "(Full)"}
                   </Button>
-                  <Button onClick={leaveSession} variant="destructive" className="flex-1 rounded-app">
+                  <Button
+                    onClick={leaveSession}
+                    variant="destructive"
+                    className="flex-1 rounded-app"
+                  >
                     Leave Session
                   </Button>
                 </div>
@@ -346,5 +368,5 @@ export function CrewSync() {
         </div>
       </div>
     </TooltipProvider>
-  )
+  );
 }

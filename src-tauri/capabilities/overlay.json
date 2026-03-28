@@ -1,9 +1,7 @@
 {
   "identifier": "overlay-capability",
   "description": "permissions for overlay windows",
-  "windows": [
-    "overlay-*"
-  ],
+  "windows": ["overlay-*"],
   "permissions": [
     "core:default",
     "core:event:default",
@@ -19,4 +17,3 @@
     "core:webview:default"
   ]
 }
-

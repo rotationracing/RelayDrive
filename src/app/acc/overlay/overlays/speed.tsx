@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { listen } from "@tauri-apps/api/event"
-import { Gauge } from "lucide-react"
-import { useEffect, useState } from "react"
-import type { OverlayModule } from "../types"
+import { listen } from "@tauri-apps/api/event";
+import { Gauge } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { OverlayModule } from "../types";
 
 interface PhysicsEventPayload {
-  timestamp?: number | string
-  status?: string
+  timestamp?: number | string;
+  status?: string;
   data?: {
-    speed_kmh?: number
-    rpm?: number
-    gear?: number
-    [key: string]: unknown
-  } | null
-  message?: string | null
+    speed_kmh?: number;
+    rpm?: number;
+    gear?: number;
+    [key: string]: unknown;
+  } | null;
+  message?: string | null;
 }
 
 const SpeedOverlay: OverlayModule = {
@@ -27,55 +27,55 @@ const SpeedOverlay: OverlayModule = {
   defaultOpacity: 92,
   baseDimensions: { width: 420, height: 100 },
   Component: ({ opacity, moveMode }) => {
-    const [speed, setSpeed] = useState<number | null>(null)
-    const [rpm, setRpm] = useState<number | null>(null)
-    const [gear, setGear] = useState<number | null>(null)
+    const [speed, setSpeed] = useState<number | null>(null);
+    const [rpm, setRpm] = useState<number | null>(null);
+    const [gear, setGear] = useState<number | null>(null);
 
     useEffect(() => {
-      let unlisten: (() => void) | null = null
-      let mounted = true
+      let unlisten: (() => void) | null = null;
+      let mounted = true;
 
       const setupListener = async () => {
         try {
           unlisten = await listen<PhysicsEventPayload>("acc://physics", (event) => {
-            if (!mounted) return
-            const data = event.payload?.data
+            if (!mounted) return;
+            const data = event.payload?.data;
             if (data) {
               if (data.speed_kmh !== undefined && data.speed_kmh !== null) {
-                setSpeed(data.speed_kmh)
+                setSpeed(data.speed_kmh);
               }
               if (data.rpm !== undefined && data.rpm !== null) {
-                setRpm(data.rpm)
+                setRpm(data.rpm);
               }
               if (data.gear !== undefined && data.gear !== null) {
-                setGear(data.gear)
+                setGear(data.gear);
               }
             }
-          })
+          });
         } catch (error) {
-          console.error("Failed to listen to ACC physics events in speed overlay:", error)
+          console.error("Failed to listen to ACC physics events in speed overlay:", error);
         }
-      }
+      };
 
-      void setupListener()
+      void setupListener();
 
       return () => {
-        mounted = false
-        unlisten?.()
-      }
-    }, [])
+        mounted = false;
+        unlisten?.();
+      };
+    }, []);
 
-    const displaySpeed = speed !== null ? Math.round(speed).toString().padStart(3, "0") : "000"
-    const displayRpm = rpm !== null ? Math.round(rpm).toString() : "0"
-    const rpmPercentage = rpm !== null && rpm > 0 ? Math.min((rpm / 8000) * 100, 100) : 0
+    const displaySpeed = speed !== null ? Math.round(speed).toString().padStart(3, "0") : "000";
+    const displayRpm = rpm !== null ? Math.round(rpm).toString() : "0";
+    const rpmPercentage = rpm !== null && rpm > 0 ? Math.min((rpm / 8000) * 100, 100) : 0;
 
     // Gear mapping: 0 = Reverse, 1 = Neutral, 2+ = Forward gears (display as gear-1)
     const displayGear = (() => {
-      if (gear === null) return "N"
-      if (gear === 0) return "R"
-      if (gear === 1) return "N"
-      return (gear - 1).toString()
-    })()
+      if (gear === null) return "N";
+      if (gear === 0) return "R";
+      if (gear === 1) return "N";
+      return (gear - 1).toString();
+    })();
 
     return (
       <div
@@ -94,7 +94,9 @@ const SpeedOverlay: OverlayModule = {
           {/* Speed section */}
           <div className="flex flex-col">
             <div className="flex items-baseline gap-2">
-              <span className="text-5xl font-semibold leading-none tabular-nums">{displaySpeed}</span>
+              <span className="text-5xl font-semibold leading-none tabular-nums">
+                {displaySpeed}
+              </span>
               <span className="text-base text-white/55">km/h</span>
             </div>
           </div>
@@ -120,9 +122,8 @@ const SpeedOverlay: OverlayModule = {
           </div>
         </div>
       </div>
-    )
+    );
   },
-}
+};
 
-export default SpeedOverlay
-
+export default SpeedOverlay;

@@ -1,12 +1,29 @@
-"use client"
+"use client";
 
-import { type SplashPhase, SplashScreen } from "@/components/splash-screen"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { initDeepLinkListener } from "@/services/deep-link"
-import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
-import { createUser, ensureDataDir, exchangeToken, fetchMe, finishStartup, getAuth, getUser, openUrlCmd, saveAuth, userExists } from "./tauri-bridge.ts"
+import { type SplashPhase, SplashScreen } from "@/components/splash-screen";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { initDeepLinkListener } from "@/services/deep-link";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import {
+  createUser,
+  ensureDataDir,
+  exchangeToken,
+  fetchMe,
+  finishStartup,
+  getAuth,
+  getUser,
+  openUrlCmd,
+  saveAuth,
+  userExists,
+} from "./tauri-bridge.ts";
 
 export default function Home() {
   const router = useRouter();
@@ -28,13 +45,13 @@ export default function Home() {
         // Updater is handled in the launcher UI based on settings.
         const hasUser = await userExists();
         if (!hasUser) {
-          nextRouteRef.current = '/onboarding';
+          nextRouteRef.current = "/onboarding";
           return;
         }
 
         const user = await getUser();
         if (!user) {
-          nextRouteRef.current = '/onboarding';
+          nextRouteRef.current = "/onboarding";
           return;
         }
 
@@ -42,7 +59,7 @@ export default function Home() {
         if ((user as any).account) {
           try {
             const auth = await getAuth();
-            if (!auth || !auth.token) throw new Error('no auth');
+            if (!auth || !auth.token) throw new Error("no auth");
             const me = await fetchMe(auth.token);
             // Save any updates to user.json if fields changed
             await createUser(
@@ -56,33 +73,37 @@ export default function Home() {
               me.imageUrl ?? null,
               me.locked ?? null,
             );
-            nextRouteRef.current = '/launcher';
+            nextRouteRef.current = "/launcher";
           } catch (err: any) {
             // If unauthorized/expired (backend returns status code in error message), prompt re-auth
             const msg = String(err ?? "");
-            if (msg.includes("401") || msg.toLowerCase().includes("unauthorized") || msg.toLowerCase().includes("expired")) {
+            if (
+              msg.includes("401") ||
+              msg.toLowerCase().includes("unauthorized") ||
+              msg.toLowerCase().includes("expired")
+            ) {
               openReauthRef.current = true;
-              nextRouteRef.current = '/launcher';
+              nextRouteRef.current = "/launcher";
             } else {
               // If some other error, continue offline with saved data
-              nextRouteRef.current = '/launcher';
+              nextRouteRef.current = "/launcher";
             }
           }
         } else {
           // Local/offline user
-          nextRouteRef.current = '/launcher';
+          nextRouteRef.current = "/launcher";
         }
       } catch (e) {
-        console.error('init failed', e);
-        nextRouteRef.current = '/onboarding';
+        console.error("init failed", e);
+        nextRouteRef.current = "/onboarding";
       } finally {
         setInitializing(false);
         // Start splash exit and reveal main window, then navigate
-        setSplashPhase('exit');
+        setSplashPhase("exit");
         setTimeout(async () => {
           await finishStartup();
           if (openReauthRef.current) setReauthOpen(true);
-          const route = nextRouteRef.current ?? '/launcher';
+          const route = nextRouteRef.current ?? "/launcher";
           router.replace(route);
         }, 500); // match SplashScreen exit duration
       }
@@ -98,7 +119,7 @@ export default function Home() {
     } catch {}
     setReauthOpen(false);
     await finishStartup();
-    router.replace('/launcher');
+    router.replace("/launcher");
   };
 
   const handleSignInAgain = async () => {
@@ -131,11 +152,13 @@ export default function Home() {
         setAuthWaiting(false);
         setReauthOpen(false);
         await finishStartup();
-        router.replace('/launcher');
+        router.replace("/launcher");
       } catch (err) {
         console.error("auth callback handling failed", err);
       } finally {
-        try { unsub?.(); } catch {}
+        try {
+          unsub?.();
+        } catch {}
       }
     });
   };
@@ -151,7 +174,8 @@ export default function Home() {
           <DialogHeader>
             <DialogTitle>Sign in required</DialogTitle>
             <DialogDescription>
-              Your session has expired. Log in again to continue with your account, or continue offline.
+              Your session has expired. Log in again to continue with your account, or continue
+              offline.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-2 flex flex-col sm:flex-row gap-2 sm:justify-end">
@@ -177,11 +201,15 @@ export default function Home() {
           <DialogHeader>
             <DialogTitle>Continue in your browser</DialogTitle>
             <DialogDescription>
-              We opened RelayDrive login in your default browser. Complete the sign-in there and keep this window open.
+              We opened RelayDrive login in your default browser. Complete the sign-in there and
+              keep this window open.
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="size-5 rounded-full border-2 border-white/30 border-t-white animate-spin" aria-label="loading" />
+            <div
+              className="size-5 rounded-full border-2 border-white/30 border-t-white animate-spin"
+              aria-label="loading"
+            />
             <span className="text-sm text-muted-foreground">Waiting for authentication...</span>
           </div>
           <div className="mt-4 flex justify-end">

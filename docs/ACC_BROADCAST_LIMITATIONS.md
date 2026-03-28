@@ -8,15 +8,15 @@ All ACC Broadcasting API message types are now fully supported through our vendo
 
 All ACC Broadcasting API message types are now fully supported:
 
-| Type | Message | Supported | Description |
-|------|---------|-----------|-------------|
-| 1 | `RegistrationResult` | ✅ Yes | Connection registration response |
-| 2 | `RealtimeUpdate` | ✅ Yes | Session-wide data (weather, timing, etc.) |
-| 3 | `RealtimeCarUpdate` | ✅ Yes | Real-time car telemetry and position |
-| 4 | `EntrylistUpdate` | ✅ Yes | List of car IDs in the session |
-| 4 | `BroadcastingEvent` | ✅ Yes | Live race events (accidents, penalties, pit stops) |
-| 5 | `TrackData` | ✅ Yes | Track info (name, length, camera sets, HUD pages) |
-| 6 | `EntrylistCar` | ✅ Yes | Complete car entry with drivers and team info |
+| Type | Message              | Supported | Description                                        |
+| ---- | -------------------- | --------- | -------------------------------------------------- |
+| 1    | `RegistrationResult` | ✅ Yes    | Connection registration response                   |
+| 2    | `RealtimeUpdate`     | ✅ Yes    | Session-wide data (weather, timing, etc.)          |
+| 3    | `RealtimeCarUpdate`  | ✅ Yes    | Real-time car telemetry and position               |
+| 4    | `EntrylistUpdate`    | ✅ Yes    | List of car IDs in the session                     |
+| 4    | `BroadcastingEvent`  | ✅ Yes    | Live race events (accidents, penalties, pit stops) |
+| 5    | `TrackData`          | ✅ Yes    | Track info (name, length, camera sets, HUD pages)  |
+| 6    | `EntrylistCar`       | ✅ Yes    | Complete car entry with drivers and team info      |
 
 ## Implementation
 
@@ -51,6 +51,7 @@ src-tauri/src/
 With complete protocol support, you now have access to:
 
 **Driver & Team Data:**
+
 - Driver names (first name, last name, short name)
 - Team names
 - Car numbers
@@ -60,6 +61,7 @@ With complete protocol support, you now have access to:
 - Nationality information
 
 **Session Data:**
+
 - Real-time car positions and speeds
 - Session timing and weather
 - Lap times and sector splits
@@ -67,12 +69,14 @@ With complete protocol support, you now have access to:
 - Race positions
 
 **Track Information:**
+
 - Track name and ID
 - Track length in meters
 - Available camera sets and cameras
 - HUD pages
 
 **Live Events:**
+
 - Accidents and incidents
 - Penalties
 - Lap completions
@@ -142,4 +146,3 @@ To verify the implementation is working:
 
 - [ACC Telemetry Guide](./ACC_TELEMETRY.md)
 - [Broadcast Map Reference](./BROADCAST_MAP.md)
-

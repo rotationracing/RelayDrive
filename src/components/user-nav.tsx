@@ -1,18 +1,8 @@
-"use client"
+"use client";
 
-import {
-  ChevronsUpDown,
-  LogOut,
-  Settings,
-  Sparkles,
-  User,
-} from "lucide-react"
+import { ChevronsUpDown, LogOut, Settings, Sparkles, User } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,41 +11,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 
 type NavUserProps = {
   user: {
-    name: string
-    email: string
-    avatar?: string | null
-  }
-  onUpgrade?: () => void
-  onProfile?: () => void
-  onSettings?: () => void
-  onLogout?: () => void
-}
+    name: string;
+    email: string;
+    avatar?: string | null;
+  };
+  onUpgrade?: () => void;
+  onProfile?: () => void;
+  onSettings?: () => void;
+  onLogout?: () => void;
+};
 
-export function NavUser({
-  user,
-  onUpgrade,
-  onProfile,
-  onSettings,
-  onLogout,
-}: NavUserProps) {
-  let sidebarContext: ReturnType<typeof useSidebar> | null = null
+export function NavUser({ user, onUpgrade, onProfile, onSettings, onLogout }: NavUserProps) {
+  let sidebarContext: ReturnType<typeof useSidebar> | null = null;
   try {
-    sidebarContext = useSidebar()
+    sidebarContext = useSidebar();
   } catch (error) {
-    sidebarContext = null
+    sidebarContext = null;
   }
 
-  const isMobile = sidebarContext?.isMobile ?? false
+  const isMobile = sidebarContext?.isMobile ?? false;
 
   const fallbackInitials = user.name
     ? user.name
@@ -65,9 +49,9 @@ export function NavUser({
         .join("")
         .slice(0, 2)
         .toUpperCase()
-    : "CN"
+    : "CN";
 
-  const emailLabel = user.email?.trim() ? user.email : "—"
+  const emailLabel = user.email?.trim() ? user.email : "—";
 
   return (
     <SidebarMenu>
@@ -81,9 +65,7 @@ export function NavUser({
               >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {fallbackInitials}
-                  </AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{fallbackInitials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -98,9 +80,7 @@ export function NavUser({
               >
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {fallbackInitials}
-                  </AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{fallbackInitials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -120,9 +100,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">
-                    {fallbackInitials}
-                  </AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{fallbackInitials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -157,5 +135,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

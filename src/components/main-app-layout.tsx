@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { usePathname } from "next/navigation"
-import DeepLinkListener from "@/components/deep-link-listener"
-import { ThemeProvider } from "@/components/theme-provider"
-import TitleBar from "@/components/titlebar"
-import { Toaster } from "@/components/ui/sonner"
-import { GlobalHotkeyListener } from "@/components/global-hotkey-listener"
-import { OverlayWindowSync } from "@/components/overlay-window-sync"
-import { HotkeyActionRegistrar } from "@/components/hotkey-action-registrar"
-import { AccPhysicsProvider } from "@/contexts/AccPhysicsContext"
-import { AccGraphicsProvider } from "@/contexts/AccGraphicsContext"
-import { AccBroadcastProvider } from "@/contexts/AccBroadcastContext"
-import { AppBootstrapProvider } from "@/contexts/AppBootstrapContext"
-import { ProcessProvider } from "@/contexts/ProcessContext"
-import { SettingsProvider } from "@/contexts/SettingsContext"
-import { UserProvider } from "@/contexts/UserContext"
-import type React from "react"
+import { usePathname } from "next/navigation";
+import DeepLinkListener from "@/components/deep-link-listener";
+import { ThemeProvider } from "@/components/theme-provider";
+import TitleBar from "@/components/titlebar";
+import { Toaster } from "@/components/ui/sonner";
+import { GlobalHotkeyListener } from "@/components/global-hotkey-listener";
+import { OverlayWindowSync } from "@/components/overlay-window-sync";
+import { HotkeyActionRegistrar } from "@/components/hotkey-action-registrar";
+import { AccPhysicsProvider } from "@/contexts/AccPhysicsContext";
+import { AccGraphicsProvider } from "@/contexts/AccGraphicsContext";
+import { AccBroadcastProvider } from "@/contexts/AccBroadcastContext";
+import { AppBootstrapProvider } from "@/contexts/AppBootstrapContext";
+import { ProcessProvider } from "@/contexts/ProcessContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
+import { UserProvider } from "@/contexts/UserContext";
+import type React from "react";
 
 export function MainAppLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isOverlayWindow = pathname?.startsWith("/overlay/")
+  const pathname = usePathname();
+  const isOverlayWindow = pathname?.startsWith("/overlay/");
 
   if (isOverlayWindow) {
     // Lightweight layout for overlay windows - minimal providers for telemetry access
@@ -33,7 +33,10 @@ export function MainAppLayout({ children }: { children: React.ReactNode }) {
               enableSystem
               disableTransitionOnChange
             >
-              <div className="bg-transparent text-foreground overflow-hidden" style={{ backgroundColor: "transparent" }}>
+              <div
+                className="bg-transparent text-foreground overflow-hidden"
+                style={{ backgroundColor: "transparent" }}
+              >
                 {children}
                 <Toaster position="bottom-right" richColors closeButton />
               </div>
@@ -41,7 +44,7 @@ export function MainAppLayout({ children }: { children: React.ReactNode }) {
           </AccGraphicsProvider>
         </AccPhysicsProvider>
       </ProcessProvider>
-    )
+    );
   }
 
   // Full app layout with all providers
@@ -80,6 +83,5 @@ export function MainAppLayout({ children }: { children: React.ReactNode }) {
         </AccGraphicsProvider>
       </AccPhysicsProvider>
     </ProcessProvider>
-  )
+  );
 }
-

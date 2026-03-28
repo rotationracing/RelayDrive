@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { type UserData, clearAuth, launchGame } from "@/app/tauri-bridge"
-import { CrewSync } from "@/components/crew-sync"
-import { Button } from "@/components/ui/button"
+import { type UserData, clearAuth, launchGame } from "@/app/tauri-bridge";
+import { CrewSync } from "@/components/crew-sync";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,34 +10,42 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { NavUser } from "@/components/user-nav"
-import { useProcess } from '@/contexts/ProcessContext';
-import { useUser } from "@/contexts/UserContext"
-import { invoke } from '@tauri-apps/api/core';
-import { listen } from '@tauri-apps/api/event';
-import { AlertTriangle, AudioWaveform, Home, Monitor, Play, SlidersHorizontal, Terminal } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { useEffect, useRef, useState } from "react"
-import { toast } from "sonner"
-import pkg from "../../package.json"
+} from "@/components/ui/dialog";
+import { NavUser } from "@/components/user-nav";
+import { useProcess } from "@/contexts/ProcessContext";
+import { useUser } from "@/contexts/UserContext";
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import {
+  AlertTriangle,
+  AudioWaveform,
+  Home,
+  Monitor,
+  Play,
+  SlidersHorizontal,
+  Terminal,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import pkg from "../../package.json";
 
-type Page = import('@/components/main-app').Page
+type Page = import("@/components/main-app").Page;
 
 interface SidebarProps {
-  currentPage: Page
-  onPageChange: (page: Page) => void
-  onboarding?: boolean
-  basePath?: string // if provided, navigate using router to `${basePath}/...`
+  currentPage: Page;
+  onPageChange: (page: Page) => void;
+  onboarding?: boolean;
+  basePath?: string; // if provided, navigate using router to `${basePath}/...`
 }
 
-type LaunchStatus = 'disconnected' | 'connecting' | 'connected'
+type LaunchStatus = "disconnected" | "connecting" | "connected";
 
 const GAME_LABELS: Record<string, { short: string; full: string }> = {
-  ACC: { short: 'ACC', full: 'Assetto Corsa Competizione' },
-  LMU: { short: 'LMU', full: 'Le Mans Ultimate' },
-  iRacing: { short: 'iRacing', full: 'iRacing' },
-}
+  ACC: { short: "ACC", full: "Assetto Corsa Competizione" },
+  LMU: { short: "LMU", full: "Le Mans Ultimate" },
+  iRacing: { short: "iRacing", full: "iRacing" },
+};
 
 export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: SidebarProps) {
   const router = useRouter();
@@ -60,8 +68,8 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   const [profile, setProfile] = useState<Profile>({
     name: "User",
     profileImage: null,
-    accountType: "free"
-  })
+    accountType: "free",
+  });
 
   const { user, refresh: refreshUser } = useUser();
   const [userName, setUserName] = useState<string | null>(null);
@@ -72,16 +80,16 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
 
     const loadProfile = async () => {
       try {
-        const profileData = await invoke<Profile>('get_profile')
+        const profileData = await invoke<Profile>("get_profile");
         if (profileData) {
-          setProfile(profileData as Profile)
-          console.log("Sidebar: Profile updated from backend", profileData)
+          setProfile(profileData as Profile);
+          console.log("Sidebar: Profile updated from backend", profileData);
         }
       } catch (err) {
         // Silently fail - we don't care about this error
         // The app should be in onboarding mode if there's no profile
       }
-    }
+    };
 
     loadProfile();
     // user is loaded by UserProvider; update local state name if present
@@ -93,13 +101,13 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
     (async () => {
       if (onboarding === false) {
         try {
-          unlisten = await listen('profile-updated', async () => {
+          unlisten = await listen("profile-updated", async () => {
             console.log("Sidebar: Received profile-updated event");
             await loadProfile();
             await refreshUser();
           });
         } catch (err) {
-          console.error('Failed to set up profile update listener:', err);
+          console.error("Failed to set up profile update listener:", err);
         }
       }
     })();
@@ -122,10 +130,12 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
   const { activeGame, isRunning, isLoading, monitorGame } = useProcess();
-  const [gameStatus, setGameStatus] = useState<LaunchStatus>('disconnected');
-  const isSelectedGameActive = gameKey ? activeGame?.toLowerCase() === gameKey.toLowerCase() : false;
+  const [gameStatus, setGameStatus] = useState<LaunchStatus>("disconnected");
+  const isSelectedGameActive = gameKey
+    ? activeGame?.toLowerCase() === gameKey.toLowerCase()
+    : false;
   const gameLabelInfo = gameKey ? GAME_LABELS[gameKey] : undefined;
-  const gameLabel = gameLabelInfo?.full ?? (gameKey ?? "Game");
+  const gameLabel = gameLabelInfo?.full ?? gameKey ?? "Game";
   const gameShortLabel = gameLabelInfo?.short ?? gameLabel;
 
   useEffect(() => {
@@ -135,22 +145,22 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
       try {
         await monitorGame(gameKey);
       } catch (err) {
-        console.error('[Sidebar] Failed to monitor game:', err);
+        console.error("[Sidebar] Failed to monitor game:", err);
       }
     })();
   }, [gameKey, isSelectedGameActive, monitorGame]);
 
   useEffect(() => {
     if (!gameKey) {
-      setGameStatus('disconnected');
+      setGameStatus("disconnected");
       return;
     }
     if (isLoading) return;
     if (isSelectedGameActive && isRunning) {
-      setGameStatus('connected');
+      setGameStatus("connected");
       return;
     }
-    setGameStatus(prev => (prev === 'connecting' ? prev : 'disconnected'));
+    setGameStatus((prev) => (prev === "connecting" ? prev : "disconnected"));
   }, [gameKey, isLoading, isSelectedGameActive, isRunning]);
 
   const menuItems = [
@@ -163,21 +173,21 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   const handleLaunchGame = async () => {
     if (!gameKey) return;
 
-    if (gameStatus === 'connected') {
+    if (gameStatus === "connected") {
       setIsConfirmDialogOpen(true);
       return;
     }
 
     console.log(`[handleLaunchGame:${gameKey}] Starting launch sequence`);
-    setGameStatus('connecting');
+    setGameStatus("connecting");
 
     // Set a timeout to handle the case where the game doesn't start
     const timeoutId = setTimeout(() => {
       console.log(`[handleLaunchGame:${gameKey}] Game launch timed out after 1 minute`);
-      setGameStatus(prev => {
-        if (prev === 'connecting') {
+      setGameStatus((prev) => {
+        if (prev === "connecting") {
           setIsErrorModalOpen(true);
-          return 'disconnected';
+          return "disconnected";
         }
         return prev;
       });
@@ -202,7 +212,7 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
     } catch (error) {
       console.error(`[handleLaunchGame:${gameKey}] Failed to launch:`, error);
       clearTimeout(timeoutId);
-      setGameStatus('disconnected');
+      setGameStatus("disconnected");
       setIsErrorModalOpen(true);
     }
   };
@@ -210,16 +220,16 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   const handleKillProcess = async () => {
     try {
       // Get the current window using Tauri's window API
-      const { getCurrentWindow } = await import('@tauri-apps/api/window');
+      const { getCurrentWindow } = await import("@tauri-apps/api/window");
       const window = getCurrentWindow();
 
       // Pass the app handle to the backend
-      await invoke('kill_process', { appHandle: { app: window } });
+      await invoke("kill_process", { appHandle: { app: window } });
 
       // Update the UI immediately
-      setGameStatus('disconnected');
+      setGameStatus("disconnected");
     } catch (error) {
-      console.error('Failed to kill process:', error);
+      console.error("Failed to kill process:", error);
       alert(`Failed to close ${gameLabel}. Please close it manually.`);
     } finally {
       setIsConfirmDialogOpen(false);
@@ -229,50 +239,52 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
   const handleLogout = async () => {
     try {
       await clearAuth();
-      toast.success('Signed out', { description: 'Authentication token removed' });
+      toast.success("Signed out", { description: "Authentication token removed" });
       // Restart app flow: go back to root so startup logic can run (and prompt for sign-in if needed)
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
-      console.error('Failed to clear auth token:', error);
-      toast.error('Failed to sign out');
+      console.error("Failed to clear auth token:", error);
+      toast.error("Failed to sign out");
     }
-  }
+  };
 
   const handleUpgrade = () => {
-    toast.info('Upgrade to Pro coming soon!');
-  }
+    toast.info("Upgrade to Pro coming soon!");
+  };
 
-  const userDisplayName = userName ?? profile.name
+  const userDisplayName = userName ?? profile.name;
   const accountLabel = (() => {
-    const role = (user?.role ?? null) || (profile.accountType === 'premium' ? 'pro' : profile.accountType ?? 'free');
-    switch ((role || 'free').toLowerCase()) {
-      case 'admin':
-        return 'Admin Account';
-      case 'pro':
-      case 'premium':
-        return 'Pro Account';
+    const role =
+      (user?.role ?? null) ||
+      (profile.accountType === "premium" ? "pro" : (profile.accountType ?? "free"));
+    switch ((role || "free").toLowerCase()) {
+      case "admin":
+        return "Admin Account";
+      case "pro":
+      case "premium":
+        return "Pro Account";
       default:
-        return 'Free Account';
+        return "Free Account";
     }
-  })()
-  const userEmail = accountLabel
-  const userAvatar = (user?.imageUrl ?? profile.profileImage) || undefined
+  })();
+  const userEmail = accountLabel;
+  const userAvatar = (user?.imageUrl ?? profile.profileImage) || undefined;
 
   const getButtonClass = () => {
     switch (gameStatus) {
       case "connected":
-        return "bg-green-600 hover:bg-green-700 text-white"
+        return "bg-green-600 hover:bg-green-700 text-white";
       case "connecting":
-        return "bg-yellow-600 hover:bg-yellow-700 text-white animate-pulse"
+        return "bg-yellow-600 hover:bg-yellow-700 text-white animate-pulse";
       default:
-        return "bg-red-accent hover:bg-red-accent/90 text-white"
+        return "bg-red-accent hover:bg-red-accent/90 text-white";
     }
-  }
+  };
 
   const buttonLabel = (() => {
-    if (gameStatus === 'connecting') return 'Connecting...';
-    if (!gameKey) return 'Launch Game';
-    if (gameStatus === 'connected') return `${gameShortLabel} Running`;
+    if (gameStatus === "connecting") return "Connecting...";
+    if (!gameKey) return "Launch Game";
+    if (gameStatus === "connected") return `${gameShortLabel} Running`;
     return `Launch ${gameShortLabel}`;
   })();
 
@@ -312,9 +324,7 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
         <div className="text-2xl font-bold">
           <span className="text-white">RelayDrive</span>
         </div>
-        <div className="text-xs text-muted-foreground">
-          {`v${appVersion ?? "0.0.0"}`}
-        </div>
+        <div className="text-xs text-muted-foreground">{`v${appVersion ?? "0.0.0"}`}</div>
       </div>
 
       {/* Navigation */}
@@ -323,8 +333,11 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
           <Button
             key={item.id}
             variant={currentPage === item.id ? "secondary" : "ghost"}
-            className={`w-full justify-start rounded-app ${currentPage === item.id ? "bg-red-accent/10 text-red-accent hover:bg-red-accent/20" : ""
-              }`}
+            className={`w-full justify-start rounded-app ${
+              currentPage === item.id
+                ? "bg-red-accent/10 text-red-accent hover:bg-red-accent/20"
+                : ""
+            }`}
             onClick={() => navigate(item.id)}
           >
             <item.icon className="w-4 h-4 mr-3" />
@@ -387,14 +400,12 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
                 Game Not Found
               </DialogTitle>
               <DialogDescription className="pt-2">
-                Could not find {gameLabel}. Please make sure the game is installed and Steam is running.
+                Could not find {gameLabel}. Please make sure the game is installed and Steam is
+                running.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
-              <Button
-                onClick={() => setIsErrorModalOpen(false)}
-                className="rounded-app w-full"
-              >
+              <Button onClick={() => setIsErrorModalOpen(false)} className="rounded-app w-full">
                 OK
               </Button>
             </DialogFooter>
@@ -406,7 +417,7 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
           user={{
             name: userDisplayName,
             email: userEmail,
-            avatar: userAvatar ?? '',
+            avatar: userAvatar ?? "",
           }}
           onUpgrade={handleUpgrade}
           onProfile={() => navigate("profile" as Page)}
@@ -415,5 +426,5 @@ export function Sidebar({ currentPage, onPageChange, onboarding, basePath }: Sid
         />
       </div>
     </div>
-  )
+  );
 }

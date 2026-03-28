@@ -1,24 +1,26 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { carNameMap } from "@/config/carNameMap"
-import { useAppBootstrap } from "@/contexts/AppBootstrapContext"
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { carNameMap } from "@/config/carNameMap";
+import { useAppBootstrap } from "@/contexts/AppBootstrapContext";
 import { useProcess } from "@/contexts/ProcessContext";
-import { invoke } from "@tauri-apps/api/core"
-import { type UnlistenFn, listen } from "@tauri-apps/api/event"
-import { Activity, Car, Gauge, Loader2, MapPin, User, Wifi, WifiOff } from "lucide-react"
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { invoke } from "@tauri-apps/api/core";
+import { type UnlistenFn, listen } from "@tauri-apps/api/event";
+import { Activity, Car, Gauge, Loader2, MapPin, User, Wifi, WifiOff } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 function HomePage() {
-  const [accStatus, setAccStatus] = useState<"disconnected" | "connecting" | "connected">("disconnected");
+  const [accStatus, setAccStatus] = useState<"disconnected" | "connecting" | "connected">(
+    "disconnected",
+  );
   const [sessionInfo, setSessionInfo] = useState({
     track: "--",
     driver: "--",
     car_model: "--",
   });
   const { isRunning, isLoading, error } = useProcess();
-  const { setIsLaunching, setLaunchingLabel } = useAppBootstrap()
+  const { setIsLaunching, setLaunchingLabel } = useAppBootstrap();
   const staticsFetchedRef = useRef(false);
 
   const fetchStatics = useCallback(async () => {
@@ -38,13 +40,13 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-    setIsLaunching(false)
-    setLaunchingLabel(null)
-  }, [setIsLaunching, setLaunchingLabel])
+    setIsLaunching(false);
+    setLaunchingLabel(null);
+  }, [setIsLaunching, setLaunchingLabel]);
 
   useEffect(() => {
     if (isLoading) return;
-    setAccStatus(isRunning ? 'connected' : 'disconnected');
+    setAccStatus(isRunning ? "connected" : "disconnected");
     if (!isRunning) {
       staticsFetchedRef.current = false;
       setSessionInfo({
@@ -56,14 +58,14 @@ function HomePage() {
   }, [isRunning, isLoading]);
 
   useEffect(() => {
-    if (accStatus === 'connected') {
+    if (accStatus === "connected") {
       staticsFetchedRef.current = false;
       fetchStatics();
     }
   }, [accStatus, fetchStatics]);
 
   useEffect(() => {
-    if (accStatus !== 'connected') {
+    if (accStatus !== "connected") {
       return;
     }
 
@@ -117,9 +119,9 @@ function HomePage() {
       track: sessionInfo.track,
       driver: sessionInfo.driver,
       car: sessionInfo.car_model,
-      isActive: accStatus === 'connected',
+      isActive: accStatus === "connected",
     }),
-    [sessionInfo, accStatus]
+    [sessionInfo, accStatus],
   );
 
   const carLabel = useMemo(() => prettifyCarName(currentSession.car), [currentSession.car]);
@@ -146,12 +148,12 @@ function HomePage() {
             <CardContent className="pt-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  {accStatus === 'connecting' ? (
+                  {accStatus === "connecting" ? (
                     <>
                       <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
                       <span>Launching...</span>
                     </>
-                  ) : accStatus === 'connected' ? (
+                  ) : accStatus === "connected" ? (
                     <Badge variant="default" className="rounded-control bg-status-online">
                       Running
                     </Badge>
@@ -311,15 +313,13 @@ function HomePage() {
             </CardContent>
           </Card>
         </div>
-
-
       </div>
     </div>
-  )
+  );
 }
 
 export default function ACCHomeRoute() {
-  return <HomePage />
+  return <HomePage />;
 }
 
 function buildDriverName(first?: string, last?: string, nick?: string): string {
