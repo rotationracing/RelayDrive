@@ -636,12 +636,6 @@ pub fn get_tracks() -> HashMap<String, Track> {
         ("Zandvoort", "Zandvoort", "Circuit Zandvoort", "Netherlands"),
         ("Zolder", "Zolder", "Circuit Zolder", "Belgium"),
         ("red_bull_ring", "Red Bull Ring", "Red Bull Ring", "Austria"),
-        (
-            "magny_cours",
-            "Magny-Cours",
-            "Circuit de Nevers Magny-Cours",
-            "France",
-        ),
     ];
 
     for (id, pretty_name, full_name, country) in track_data {
