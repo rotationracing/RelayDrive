@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { AccountCard } from "@/components/settings/account-card";
 import { useSettingsContext } from "@/contexts/SettingsContext";
 import { setLocale, useI18n } from "@/i18n";
 import type { LanguageCode } from "@/lib/language";
@@ -308,6 +309,8 @@ export function SettingsPage() {
               </p>
             </div>
           </header>
+
+          <AccountCard />
 
           <SettingsSection eyebrow="General">
             <SettingsRow
